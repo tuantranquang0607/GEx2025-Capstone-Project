@@ -1,0 +1,20 @@
+# level config
+
+#        S     F(r,g,b),   O(r,g,b),  OT,  width, height
+Paddle  800    255  0  0    255  0  0  4    120   10
+
+#        rows  col       O(r,g,b),    OT,   width, height
+Blocks   8     12        0  0  0      1       80   20
+
+# Block Fill Colors RGB
+BFC 220  90   140
+BFC 240  70   70
+BFC 240  110  55
+BFC 245  200  0
+BFC 95   200  57
+BFC 60   60   230
+BFC 140  70   255
+BFC 60   230  230
+
+#      radius   speed        F(r,g,b)
+Ball     10      500      255  255  255
