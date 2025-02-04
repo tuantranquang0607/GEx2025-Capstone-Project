@@ -2,7 +2,7 @@
 //
 //  Assignment:
 //  Instructor:     David Burchill
-//  Year / Term:    Fall 2024
+//  Year / Term:    Winter 2025
 //  File name:      Source.cpp
 //
 //  Student name:   Tuan Q. Tran

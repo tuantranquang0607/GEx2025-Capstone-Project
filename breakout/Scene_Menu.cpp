@@ -6,8 +6,7 @@ void Scene_Menu::onEnd()
 	_game->window().close();
 }
 
-Scene_Menu::Scene_Menu(GameEngine* gameEngine)
-	: Scene(gameEngine)
+Scene_Menu::Scene_Menu(GameEngine* gameEngine) : Scene(gameEngine)
 {
 	init();
 }
@@ -29,17 +28,15 @@ void Scene_Menu:: init()
 	registerAction(sf::Keyboard::Escape, "QUIT");
 
 	// Strings
-	_title = "Breakout";
+	_title = "Snappy Snake";
 
-	_menuStrings.push_back("Level 1");
-	_menuStrings.push_back("Level 2");
-	_menuStrings.push_back("Level 3");
-	_menuStrings.push_back("Level 4");
+	_menuStrings.push_back("Play");
+	_menuStrings.push_back("About the game");
+	_menuStrings.push_back("About the developer");
 
 	_levelPaths.push_back("../level1.txt");
 	_levelPaths.push_back("../level2.txt");
 	_levelPaths.push_back("../level3.txt");
-	_levelPaths.push_back("../level4.txt");
 
 	const size_t CHAR_SIZE{ 64 };
 	_menuText.setCharacterSize(CHAR_SIZE);
@@ -58,7 +55,7 @@ void Scene_Menu::sRender()
 	static const sf::Color normalColor(0, 0, 0);
 	static const sf::Color backgroundColor(100, 100, 255);
 
-	sf::Text footer("UP: W   DOWN: S   PLAY: D   QUIT: EXC", Assets::getInstance().getFont("main"), 20);
+	sf::Text footer("UP: W   DOWN: S   PLAY: D   QUIT: EXCAPE", Assets::getInstance().getFont("main"), 20);
 
 	footer.setFillColor(normalColor);
 	auto winSize = _game->windowSize();

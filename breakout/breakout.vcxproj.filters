@@ -45,7 +45,7 @@
     <ClCompile Include="Utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene_breakout.cpp">
+    <ClCompile Include="Scene_Snake.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,7 +80,7 @@
     <ClInclude Include="Utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene_breakout.h">
+    <ClInclude Include="Scene_Snake.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
