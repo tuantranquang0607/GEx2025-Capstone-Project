@@ -1,6 +1,6 @@
 #include "Scene_Menu.h"
 #include "Scene_Snake.h" 
-//#include "MusicPlayer.h"
+#include "MusicPlayer.h"
 
 #include <memory>
 #include <iostream>
@@ -17,6 +17,9 @@ Scene_Menu::Scene_Menu(GameEngine* gameEngine) : Scene(gameEngine)
 
 void Scene_Menu::init()
 {
+	MusicPlayer::getInstance().play("menuTheme");
+	MusicPlayer::getInstance().setVolume(75);
+
 	// Register actions
 	registerAction(sf::Keyboard::W, "UP");
 	registerAction(sf::Keyboard::Up, "UP");
@@ -54,7 +57,7 @@ void Scene_Menu::init()
 	_levelPaths.push_back("../level2.txt");
 	_levelPaths.push_back("../level3.txt");
 
-	const size_t CHAR_SIZE{ 64 };
+	const size_t CHAR_SIZE{ 100 };
 	_menuText.setCharacterSize(CHAR_SIZE);
 	_menuText.setFont(Assets::getInstance().getFont("main"));
 }

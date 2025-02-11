@@ -14,14 +14,12 @@
 class Assets {
 
 private:
-    // singleton class
     Assets();
     ~Assets() = default;
 
 public:
     static Assets& getInstance();
 
-    // no copy or move
     Assets(const Assets&)               = delete;
     Assets(Assets&&)                    = delete;
     Assets& operator=(const Assets&)    = delete;
@@ -29,13 +27,17 @@ public:
 
 private:
     std::map<std::string, std::unique_ptr<sf::Font>>            _fontMap;
+    std::map<std::string, std::unique_ptr<sf::SoundBuffer>>     _soundEffects;
+
+    void loadSounds(const std::string& path);
  
 public:
     void                    loadFromFile(const std::string path);
     void                    addFont(const std::string &fontName, const std::string &path);
     const sf::Font&         getFont(const std::string &fontName) const;   
-
+    void addSound(const std::string& soundEffectName, const std::string& path);
+    const sf::SoundBuffer& getSound(const std::string& fontName) const;
 };
 
 
-#endif //BREAKOUT_ASSETS_H
+#endif
