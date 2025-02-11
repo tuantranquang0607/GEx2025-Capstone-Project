@@ -14,6 +14,10 @@ private:
 
 	void						init();
 	void						onEnd() override;
+
+	sf::Sprite _backgroundSprite;
+	sf::Texture _backgroundTexture;
+
 public:
 
 	Scene_Menu(GameEngine* gameEngine);

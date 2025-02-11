@@ -1,13 +1,23 @@
 #pragma once
-#include "Scene.h"
 
-class Scene_breakout : public Scene
+#include "Scene.h"
+#include "EntityManager.h"
+#include "GameEngine.h"
+
+class Scene_Snake : public Scene
 {
-	void onEnd() override;
+private:
+    // Add any members related to the Snake scene, like game state, snake objects, etc.
 
 public:
-	/*Scene_Breakout(GameEngine* gameEngine):
+    Scene_Snake(GameEngine* gameEngine, const std::string& levelPath);
 
-	void*/
+    void onEnd() override;
+    void update(sf::Time dt) override;
+    void sDoAction(const Command& action) override;
+    void sRender() override;
+
+    void launchSnakeGameWindow();
 };
+
 

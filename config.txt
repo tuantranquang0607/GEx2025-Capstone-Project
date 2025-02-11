@@ -1,13 +1,13 @@
 # Game Config
 
-Window  1080 760
+Window  1200 1200
 Font main ../assets/sansation.ttf
 
-SoundEffect blockHit ../assets/Sounds/block.wav
+SoundEffect appleHit ../assets/pop.wav
 SoundEffect paddleHit ../assets/Sounds/paddle.wav
 SoundEffect wallHit ../assets/Sounds/wall.wav
 
-Music mainTheme ../assets/Music/8bitTheme.ogg
+Music mainTheme ../assets/theme.wav
 
 #        S     F(r,g,b),   O(r,g,b),  OT,  width, height
 Player  800    255  0  0    255  0  0  4    120   10

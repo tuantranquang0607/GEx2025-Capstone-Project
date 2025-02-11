@@ -9,7 +9,7 @@
 
 using CommandMap = std::map<int, std::string>;
 
-class Scene_Breakout;
+class Scene_Snake;
 
 class Scene
 {
