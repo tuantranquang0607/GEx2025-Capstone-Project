@@ -83,6 +83,21 @@ void Assets::loadSounds(const std::string& path)
     confFile.close();
 }
 
+void Assets::AddTexture(int id, const std::string& filePath, bool wantRepeated)
+{
+    auto texture = std::make_unique<sf::Texture>();
+
+    if (texture->loadFromFile(filePath))
+    {
+        texture->setRepeated(wantRepeated);
+        m_textures[id] = std::move(texture);
+    }
+    else
+    {
+        std::cout << "Failed to load texture from file: " << filePath << std::endl;
+    }
+}
+
 void Assets::loadFromFile(const std::string path) {
 
     std::ifstream config(path);
