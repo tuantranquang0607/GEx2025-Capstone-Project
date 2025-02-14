@@ -98,6 +98,11 @@ void Assets::AddTexture(int id, const std::string& filePath, bool wantRepeated)
     }
 }
 
+const sf::Texture& Assets::GetTexture(int id) const
+{
+    return *(m_textures.at(id).get());
+}
+
 void Assets::loadFromFile(const std::string path) {
 
     std::ifstream config(path);

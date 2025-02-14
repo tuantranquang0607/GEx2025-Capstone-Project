@@ -119,15 +119,7 @@ void Scene_Menu::sDoAction(const Command& action)
 		}
 		else if (action.name() == "PLAY")
 		{
-			/*_game->changeScene("PLAY", std::make_shared<Scene_Snake>(_game));*/
-
-			//if (_menuIndex < _levelPaths.size())
-			//{
-			//	// Start the Snake game window
-			//	std::shared_ptr<Scene_Snake> snakeScene = std::make_shared<Scene_Snake>(_game, _levelPaths[_menuIndex]);
-			//	// Launch the separate Snake game window
-			//	snakeScene->launchSnakeGameWindow(); 
-			//}
+			_game->changeScene("PLAY", std::make_shared<Scene_Snake>(_game));
 		}
 		else if (action.name() == "QUIT")
 		{

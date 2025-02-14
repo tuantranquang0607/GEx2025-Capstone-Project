@@ -3,19 +3,21 @@
 #include "EntityManager.h"
 #include "GameEngine.h"
 #include "Command.h"
+#include "State.h"
+#include "Game.h"
+
 #include <map>
 #include <string>
 
+#include <SFML/System/Time.hpp>
 
 using CommandMap = std::map<int, std::string>;
 
 class Scene_Snake;
 
-class Scene
+class Scene : public State
 {
-
 protected:
-
 	GameEngine			*_game;
 	EntityManager		_entityManager;
 	CommandMap			_commands;
