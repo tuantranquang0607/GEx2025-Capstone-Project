@@ -28,32 +28,45 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="Assets1.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="GameOver.cpp" />
+    <ClCompile Include="GamePlay.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MusicPlayer.cpp" />
+    <ClCompile Include="PauseGame.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Scene_Snake.cpp" />
     <ClCompile Include="Scene_Menu.cpp" />
+    <ClCompile Include="Snake.cpp" />
     <ClCompile Include="SoundPlayer.cpp" />
+    <ClCompile Include="StateMan.cpp" />
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assets.h" />
+    <ClInclude Include="Assets1.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="GameOver.h" />
+    <ClInclude Include="GamePlay.h" />
     <ClInclude Include="MusicPlayer.h" />
+    <ClInclude Include="PauseGame.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene_Snake.h" />
     <ClInclude Include="Scene_Menu.h" />
+    <ClInclude Include="Snake.h" />
     <ClInclude Include="SoundPlayer.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="StateMan.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -18,8 +18,8 @@
 class Assets {
 
 private:
-    Assets();
-    ~Assets() = default;
+    /*Assets();
+    ~Assets() = default;*/
 
     std::map<std::string, std::unique_ptr<sf::Font>>            _fontMap;
     std::map<std::string, std::unique_ptr<sf::SoundBuffer>>     _soundEffects;
@@ -28,6 +28,9 @@ private:
     void   loadSounds(const std::string& path);
 
 public:
+    Assets();
+    ~Assets() = default;
+
     static Assets& getInstance();
 
     Assets(const Assets&)               = delete;

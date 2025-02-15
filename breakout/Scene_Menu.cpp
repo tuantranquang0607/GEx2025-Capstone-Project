@@ -119,7 +119,7 @@ void Scene_Menu::sDoAction(const Command& action)
 		}
 		else if (action.name() == "PLAY")
 		{
-			/*_game->changeScene("PLAY", std::make_shared<Scene_Snake>(_game));*/
+			_game->changeScene("PLAY", std::make_shared<Scene_Snake>(_game));
 		}
 		else if (action.name() == "QUIT")
 		{
