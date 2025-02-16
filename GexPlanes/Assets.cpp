@@ -274,6 +274,8 @@ void Assets::loadFromFile(const std::string path)
     loadTextures(path);
     loadSounds(path);
     addTexture("logo", "../assets/logo.png");
+    addTexture("wall", "../assets/Textures/wall.png");
+    addTexture("snake", "../assets/Textures/snake.png");
 
     /*loadJson(path);
     loadAnimations(path)*/;  // requires  _framesets must come after loadJson

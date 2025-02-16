@@ -80,6 +80,11 @@ class Scene_Snake : public Scene
     void drawHP(sPtrEntt e);                                // Draw the health points of an entity
     void drawAmmo(sPtrEntt e);                              // Draw the ammo count of an entity
     void drawEntt(sPtrEntt e);                              // Draw an entity
+	void spawnWalls();                                      // Spawn walls in the scene
+
+    std::vector<std::shared_ptr<Entity>> _walls;            // Store all wall entities
+    const int _gridSize = 25;                               // grid size
+    float _cellSize;                                        // grid cell
 
 public:
     // Constructor to initialize the planes scene with a game engine and level path

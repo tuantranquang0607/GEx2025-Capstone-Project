@@ -144,4 +144,20 @@ struct CState : public Component {
     CState(const std::string& s) : state(s) {}  // Parameterized constructor
 };
 
+// Component for handling shapes
+struct CShape : public Component
+{
+    std::shared_ptr<sf::Shape> shape{ nullptr };
+
+    CShape() = default;
+
+    CShape(std::shared_ptr<sf::Shape> shape, const sf::Color& fill, const sf::Color& outline = sf::Color::Black, float thickness = 1.f)
+        : shape(shape)
+    {
+        shape->setFillColor(fill);
+        shape->setOutlineColor(outline);
+        shape->setOutlineThickness(thickness);
+    }
+};
+
 #endif //BREAKOUT_COMPONENTS_H

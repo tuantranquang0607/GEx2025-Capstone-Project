@@ -5,8 +5,9 @@
 #include "Entity.h" // Include the Entity header
 
 // Constructor to initialize the entity with an ID and tag
-Entity::Entity(size_t id, const std::string &tag) : _tag(tag) // Initialize the tag
-        , _id(id) // Initialize the ID
+Entity::Entity(size_t id, const std::string &tag) : 
+    _tag(tag),  // Initialize the tag
+    _id(id)     // Initialize the ID
 {
 }
 

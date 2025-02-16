@@ -34,7 +34,9 @@ namespace {
 }
 
 Scene_Snake::Scene_Snake(GameEngine *gameEngine, const std::string &levelPath)
-    : Scene(gameEngine), _worldView(gameEngine->window().getDefaultView()) {
+    : Scene(gameEngine), 
+    _worldView(gameEngine->window().getDefaultView()) 
+{
     init(levelPath);
 }
 
@@ -42,8 +44,15 @@ void Scene_Snake::init(const std::string &levelPath) {
     loadLevel(levelPath);
     registerActions();
 
-    sf::Vector2f spawnPos{_worldView.getSize().x / 2.f, _worldBounds.height - _worldView.getSize().y / 2.f};
+    // Calculate cell size dynamically
+    sf::Vector2u windowSize = _game->window().getSize();
+    _cellSize = static_cast<float>(windowSize.x) / _gridSize;
 
+    /*sf::Vector2f spawnPos{ _worldView.getSize().x / 2.f, _worldBounds.height - _worldView.getSize().y / 2.f };*/
+    // Center spawn position at (7,7) grid location
+    sf::Vector2f spawnPos{(_gridSize / 2) * _cellSize, (_gridSize / 2) * _cellSize};
+
+    spawnWalls();
 
     // _worldView is the camera. It's view is the same size as the render window
     // _worldBounds is the boundry of our game world.
@@ -75,18 +84,49 @@ void Scene_Snake::sDoAction(const Command &command) {
             command.name() == "TOGGLE_CAMOUTLINE") { _drawCam = !_drawCam; }
 
         // Player control
-        else if (command.name() == "LEFT") { _player->getComponent<CInput>().left = true; } else if (
-            command.name() == "RIGHT") { _player->getComponent<CInput>().right = true; } else if (
-            command.name() == "UP") { _player->getComponent<CInput>().up = true; } else if (command.name() == "DOWN") {
+        else if (command.name() == "LEFT") 
+        { 
+            _player->getComponent<CInput>().left = true; 
+        } 
+        else if (command.name() == "RIGHT") 
+        { 
+            _player->getComponent<CInput>().right = true; 
+        } 
+        else if (command.name() == "UP") 
+        { 
+            _player->getComponent<CInput>().up = true; 
+        } 
+        else if (command.name() == "DOWN") 
+        {
             _player->getComponent<CInput>().down = true;
-        } else if (command.name() == "LAUNCH") { spawnMisille(); } else if (command.name() == "FIRE") { fireBullet(); }
+        } 
+        /*else if (command.name() == "LAUNCH") 
+        { 
+            spawnMisille(); 
+        } 
+        else if (command.name() == "FIRE") 
+        { 
+            fireBullet(); 
+        }*/
     }
     // on Key Release
-    else if (command.type() == "END") {
+    else if (command.type() == "END") 
+    {
         // Player control
-        if (command.name() == "LEFT") { _player->getComponent<CInput>().left = false; } else if (
-            command.name() == "RIGHT") { _player->getComponent<CInput>().right = false; } else if (
-            command.name() == "UP") { _player->getComponent<CInput>().up = false; } else if (command.name() == "DOWN") {
+        if (command.name() == "LEFT") 
+        { 
+            _player->getComponent<CInput>().left = false; 
+        } 
+        else if (command.name() == "RIGHT") 
+        { 
+            _player->getComponent<CInput>().right = false; 
+        } 
+        else if (command.name() == "UP") 
+        { 
+            _player->getComponent<CInput>().up = false; 
+        } 
+        else if (command.name() == "DOWN") 
+        {
             _player->getComponent<CInput>().down = false;
         }
     }
@@ -156,11 +196,11 @@ void Scene_Snake::drawAmmo(sPtrEntt e ) {
 
 void Scene_Snake::drawEntt(sPtrEntt e) {
     // Draw Sprite
-    auto&anim = e->getComponent<CAnimation>().animation;
+    /*auto&anim = e->getComponent<CAnimation>().animation;
     auto&tfm = e->getComponent<CTransform>();
     anim.getSprite().setPosition(tfm.pos);
     anim.getSprite().setRotation(tfm.angle);
-    _game->window().draw(anim.getSprite());
+    _game->window().draw(anim.getSprite());*/
 }
 
 void Scene_Snake::sRender() {
@@ -172,6 +212,20 @@ void Scene_Snake::sRender() {
             auto &sprite = e->getComponent<CSprite>().sprite;
             _game->window().draw(sprite);
         }
+    }
+
+    // Draw walls
+    for (auto& wall : _walls)
+    {
+        auto& sprite = wall->getComponent<CSprite>().sprite;
+        _game->window().draw(sprite);
+    }
+
+    // draw player
+    if (_player->hasComponent<CSprite>())
+    {
+        auto& sprite = _player->getComponent<CSprite>().sprite;
+        _game->window().draw(sprite);
     }
 
     // draw pickups
@@ -226,11 +280,16 @@ void Scene_Snake::spawnPlayer(sf::Vector2f pos) {
     /*auto bb = _player->addComponent<CAnimation>(Assets::getInstance().getAnimation("EagleStr")).animation.getBB();
     _player->addComponent<CBoundingBox>(bb);*/
 
+    // Create and position the snake sprite
+    auto& sprite = _player->addComponent<CSprite>(Assets::getInstance().getTexture("snake")).sprite;
+    sprite.setOrigin(sprite.getLocalBounds().width / 2.f, sprite.getLocalBounds().height / 2.f);
+    sprite.setPosition(pos);
+
     _player->addComponent<CState>("straight");
     _player->addComponent<CInput>();
-    _player->addComponent<CHealth>(100);
+    /*_player->addComponent<CHealth>(100);
     _player->addComponent<CGun>();
-    _player->addComponent<CMissiles>();
+    _player->addComponent<CMissiles>();*/
 }
 
 
@@ -246,16 +305,17 @@ void Scene_Snake::playerMovement() {
     if (pInput.right) pv.x += 1;
     if (pInput.up) pv.y -= 1;
     if (pInput.down) pv.y += 1;
+
     pv = normalize(pv);
     _player->getComponent<CTransform>().vel = _config.playerSpeed * pv;
 
-    annimatePlayer();
+    /*annimatePlayer();*/
 }
 
 
 void Scene_Snake::annimatePlayer() {
-    //if (_player->getComponent<CState>().state == "dead")
-    //    return;
+    if (_player->getComponent<CState>().state == "dead")
+        return;
 
     //auto pv = _player->getComponent<CTransform>().vel;
     //// implement roll animation, set texture rec accordingly
@@ -269,7 +329,7 @@ void Scene_Snake::annimatePlayer() {
 
 
 void Scene_Snake::adjustPlayerPosition() {
-    // don;t ajust position if dead
+    // don't ajust position if dead
     if (_player->getComponent<CState>().state == "dead")
         return;
 
@@ -281,14 +341,14 @@ void Scene_Snake::adjustPlayerPosition() {
     auto top = center.y - viewHalfSize.y;
     auto bot = center.y + viewHalfSize.y;
 
-    auto &player_pos = _player->getComponent<CTransform>().pos;
-    auto halfSize = _player->getComponent<CBoundingBox>().halfSize;
+    /*auto &player_pos = _player->getComponent<CTransform>().pos;
+    auto halfSize = _player->getComponent<CBoundingBox>().halfSize;*/
 
     // keep player in bounds
-    player_pos.x = std::max(player_pos.x, left + halfSize.x);
+    /*player_pos.x = std::max(player_pos.x, left + halfSize.x);
     player_pos.x = std::min(player_pos.x, right - halfSize.x);
     player_pos.y = std::max(player_pos.y, top + halfSize.y);
-    player_pos.y = std::min(player_pos.y, bot - halfSize.y);
+    player_pos.y = std::min(player_pos.y, bot - halfSize.y);*/
 }
 
 
@@ -375,7 +435,6 @@ void Scene_Snake::sMovement(sf::Time dt) {
     playerMovement();
     /*annimatePlayer();*/
 
-
     // move all objects
     for (auto e: _entityManager.getEntities()) {
         if (e->hasComponent<CTransform>()) {
@@ -413,6 +472,34 @@ void Scene_Snake::sUpdate(sf::Time dt) {
 
 void Scene_Snake::onEnd() {
     _game->changeScene("MENU", nullptr, false);
+}
+
+
+void Scene_Snake::spawnWalls()
+{
+    _walls.clear(); // Remove existing walls if any
+
+    sf::Vector2f wallSize(_cellSize, _cellSize); // Each wall block is 80x80
+
+    for (int x = 0; x < _gridSize; ++x)
+    {
+        for (int y = 0; y < _gridSize; ++y)
+        {
+            // Only place walls at the edges
+            if (x == 0 || x == _gridSize - 1 || y == 0 || y == _gridSize - 1)
+            {
+                auto wall = _entityManager.addEntity("wall");
+                wall->addComponent<CTransform>(sf::Vector2f(x * _cellSize, y * _cellSize));
+
+                // Use a sprite instead of a shape
+                auto& sprite = wall->addComponent<CSprite>(Assets::getInstance().getTexture("wall")).sprite;
+                sprite.setPosition(x * _cellSize, y * _cellSize);
+                sprite.setScale(_cellSize / sprite.getTexture()->getSize().x, _cellSize / sprite.getTexture()->getSize().y);
+
+                _walls.push_back(wall);
+            }
+        }
+    }
 }
 
 
@@ -700,26 +787,26 @@ void Scene_Snake::startAnimation(sPtrEntt e, std::string animation) {
 
 
 void Scene_Snake::checkIfDead(sPtrEntt e) {
-    std::uniform_int_distribution<int> flip(1, 2);
+    //std::uniform_int_distribution<int> flip(1, 2);
 
-    // when plane entitie dies run an explosion animation before destroying the entity
-    if (e->hasComponent<CHealth>()) {
-        if (e->getComponent<CHealth>().hp <= 0) {
-            /*e->addComponent<CAnimation>(Assets::getInstance().getAnimation("explosion"));*/
-            e->getComponent<CTransform>().vel = sf::Vector2f(0, 0);
-            e->removeComponent<CHealth>();
-            e->removeComponent<CBoundingBox>();
-            e->addComponent<CState>().state = "Dead";
-            if (flip(rng) == 1) {
-                SoundPlayer::getInstance().play("Explosion1", e->getComponent<CTransform>().pos);
-            } else {
-                SoundPlayer::getInstance().play("Explosion2", e->getComponent<CTransform>().pos);
-            }
+    //// when plane entitie dies run an explosion animation before destroying the entity
+    //if (e->hasComponent<CHealth>()) {
+    //    if (e->getComponent<CHealth>().hp <= 0) {
+    //        /*e->addComponent<CAnimation>(Assets::getInstance().getAnimation("explosion"));*/
+    //        e->getComponent<CTransform>().vel = sf::Vector2f(0, 0);
+    //        e->removeComponent<CHealth>();
+    //        e->removeComponent<CBoundingBox>();
+    //        e->addComponent<CState>().state = "Dead";
+    //        if (flip(rng) == 1) {
+    //            SoundPlayer::getInstance().play("Explosion1", e->getComponent<CTransform>().pos);
+    //        } else {
+    //            SoundPlayer::getInstance().play("Explosion2", e->getComponent<CTransform>().pos);
+    //        }
 
-            if (e->getTag() == "enemy")
-                dropPickup(e->getComponent<CTransform>().pos);
-        }
-    }
+    //        if (e->getTag() == "enemy")
+    //            dropPickup(e->getComponent<CTransform>().pos);
+    //    }
+    //}
 }
 
 void Scene_Snake::dropPickup(sf::Vector2f pos) {
