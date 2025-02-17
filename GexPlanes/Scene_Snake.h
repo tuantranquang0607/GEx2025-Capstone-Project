@@ -80,9 +80,6 @@ class Scene_Snake : public Scene
     void drawAmmo(sPtrEntt e);                              // Draw the ammo count of an entity
     void drawEntt(sPtrEntt e);                              // Draw an entity
 
-	void spawnWalls();                                      // Spawn walls in the scene
-    std::vector<std::shared_ptr<Entity>> _walls;            // Store all wall entities
-
     const int _gridSize = 33;                               // grid size
     float _cellSize;                                        // grid cell
 
@@ -92,9 +89,13 @@ class Scene_Snake : public Scene
     std::random_device _rd;
     std::mt19937 _rng;
 
-	void spawnApple();      		                        // Spawn an apple in the scene        
-
+    void spawnWalls();                                      // Spawn walls in the scene
+    std::vector<std::shared_ptr<Entity>> _walls;            // Store all wall entities
+	void spawnApple();      		                        // Spawn an apple in the scene
 	void updateAppleJitter(sf::Time dt);					// Update the apple jitter effect
+    void checkAppleCollision();                             // Check if the snake eats the apple
+    void growSnake();                                       // Increase the snake's length when eating an apple
+    sf::Vector2f getValidApplePosition();                   // Get a valid apple position avoiding walls and the snake
 
 public:
     // Constructor to initialize the planes scene with a game engine and level path

@@ -36,20 +36,57 @@ namespace {
 void Scene_Snake::spawnApple()
 {
     std::uniform_int_distribution<int> dist(1, _gridSize - 2); // Avoid edges
-    int gridX = dist(_rng);
-    int gridY = dist(_rng);
+    sf::Vector2f applePos;
+    bool validPosition = false;
 
-    sf::Vector2f applePos(gridX * _cellSize, gridY * _cellSize);
+    while (!validPosition)
+    {
+        int gridX = dist(_rng);
+        int gridY = dist(_rng);
+        applePos = sf::Vector2f(gridX * _cellSize, gridY * _cellSize);
+        validPosition = true;
 
-    _apple = _entityManager.addEntity("apple");
-    _apple->addComponent<CTransform>(applePos);
+        // Check if apple spawns on the snake
+        if (_player->getComponent<CTransform>().pos == applePos)
+        {
+            validPosition = false;
+            continue;
+        }
 
-    auto& sprite = _apple->addComponent<CSprite>(Assets::getInstance().getTexture("apple")).sprite;
-    sprite.setPosition(applePos);
+        for (auto& segment : _entityManager.getEntities("snake"))
+        {
+            if (segment->getComponent<CTransform>().pos == applePos)
+            {
+                validPosition = false;
+                break;
+            }
+        }
 
-    // Scale the apple so it's exactly one grid cell in size
-    sf::Vector2u textureSize = sprite.getTexture()->getSize();
-    sprite.setScale(_cellSize / textureSize.x, _cellSize / textureSize.y);
+        // Check if apple spawns on a wall
+        for (auto& wall : _walls)
+        {
+            if (wall->getComponent<CTransform>().pos == applePos)
+            {
+                validPosition = false;
+                break;
+            }
+        }
+    }
+
+    if (!_apple)
+    {
+        _apple = _entityManager.addEntity("apple");
+        _apple->addComponent<CTransform>(applePos);
+        auto& sprite = _apple->addComponent<CSprite>(Assets::getInstance().getTexture("apple")).sprite;
+        sprite.setPosition(applePos);
+        sf::Vector2u textureSize = sprite.getTexture()->getSize();
+        sprite.setScale(_cellSize / textureSize.x, _cellSize / textureSize.y);
+    }
+    else
+    {
+        _apple->getComponent<CTransform>().pos = applePos;
+        _apple->getComponent<CSprite>().sprite.setPosition(applePos);
+    }
 }
 
 void Scene_Snake::updateAppleJitter(sf::Time dt)
@@ -507,10 +544,9 @@ void Scene_Snake::sUpdate(sf::Time dt) {
     SoundPlayer::getInstance().removeStoppedSounds();
     _entityManager.update();
     /*_worldView.move(0.f, _config.scrollSpeed * dt.asSeconds() * -1);*/
-
     updateAppleJitter(dt);
+    checkAppleCollision();
     _entityManager.update();
-
     /*sAnimation(dt);
     sAutoPilot(dt);*/
     sMovement(dt);
@@ -553,6 +589,83 @@ void Scene_Snake::spawnWalls()
             }
         }
     }
+}
+
+void Scene_Snake::checkAppleCollision()
+{
+    if (!_apple || !_player) return;  // Ensure entities exist
+
+    auto& snakeHeadPos = _player->getComponent<CTransform>().pos;
+    auto& applePos = _apple->getComponent<CTransform>().pos;
+
+    // If snake head and apple position match (checking within a small margin for precision)
+    if (std::abs(snakeHeadPos.x - applePos.x) < _cellSize * 0.5f &&
+        std::abs(snakeHeadPos.y - applePos.y) < _cellSize * 0.5f)
+    {
+
+        growSnake();         // Increase snake length
+        spawnApple();        // Respawn the apple at a new position
+    }
+}
+
+void Scene_Snake::growSnake()
+{
+    auto& snakeParts = _entityManager.getEntities("snake");
+
+    // If this is the first segment, attach it behind the snake head
+    sf::Vector2f lastPartPos = _player->getComponent<CTransform>().pos;
+
+    if (!snakeParts.empty())
+    {
+        lastPartPos = snakeParts.back()->getComponent<CTransform>().pos;
+    }
+
+    // Create a new body segment
+    auto segment = _entityManager.addEntity("snake");
+    segment->addComponent<CTransform>(lastPartPos);
+
+    // Use the same sprite texture as the snake head
+    auto& sprite = segment->addComponent<CSprite>(Assets::getInstance().getTexture("snake")).sprite;
+
+    // Scale to match grid cell size
+    sf::Vector2u textureSize = sprite.getTexture()->getSize();
+    sprite.setScale(_cellSize / textureSize.x, _cellSize / textureSize.y);
+    sprite.setPosition(lastPartPos);
+}
+
+
+sf::Vector2f Scene_Snake::getValidApplePosition()
+{
+    std::uniform_int_distribution<int> dist(1, _gridSize - 2); // Avoid edges
+    sf::Vector2f newApplePos;
+
+    bool valid = false;
+    while (!valid)
+    {
+        int gridX = dist(_rng);
+        int gridY = dist(_rng);
+        newApplePos = sf::Vector2f(gridX * _cellSize, gridY * _cellSize);
+        valid = true;
+
+        // Ensure it does not overlap with the snake or walls
+        for (auto& segment : _entityManager.getEntities("snake"))
+        {
+            if (segment->getComponent<CTransform>().pos == newApplePos)
+            {
+                valid = false;
+                break;
+            }
+        }
+        for (auto& wall : _walls)
+        {
+            if (wall->getComponent<CTransform>().pos == newApplePos)
+            {
+                valid = false;
+                break;
+            }
+        }
+    }
+    return newApplePos;
 }
 
 
