@@ -1047,7 +1047,7 @@ void Scene_Snake::checkMissileCollision() {
 }
 
 void Scene_Snake::startAnimation(sPtrEntt e, std::string animation) {
-    /
+    //
 }
 
 
