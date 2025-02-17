@@ -33,8 +33,42 @@ namespace {
     };
 }
 
-Scene_Snake::Scene_Snake(GameEngine *gameEngine, const std::string &levelPath)
-    : Scene(gameEngine), 
+void Scene_Snake::spawnApple()
+{
+    std::uniform_int_distribution<int> dist(1, _gridSize - 2); // Avoid edges
+    int gridX = dist(_rng);
+    int gridY = dist(_rng);
+
+    sf::Vector2f applePos(gridX * _cellSize, gridY * _cellSize);
+
+    _apple = _entityManager.addEntity("apple");
+    _apple->addComponent<CTransform>(applePos);
+
+    auto& sprite = _apple->addComponent<CSprite>(Assets::getInstance().getTexture("apple")).sprite;
+    sprite.setPosition(applePos);
+
+    // Scale the apple so it's exactly one grid cell in size
+    sf::Vector2u textureSize = sprite.getTexture()->getSize();
+    sprite.setScale(_cellSize / textureSize.x, _cellSize / textureSize.y);
+}
+
+void Scene_Snake::updateAppleJitter(sf::Time dt)
+{
+    if (!_apple) return;  // Skip if apple doesn't exist
+
+    static std::random_device rd;
+    static std::mt19937 rng(rd());
+    static std::uniform_real_distribution<float> jitterDist(-3.f, 3.f);  // Small shake range
+
+    auto& transform = _apple->getComponent<CTransform>();
+
+    // Apply a random jitter movement
+    transform.pos += sf::Vector2f(jitterDist(rng), jitterDist(rng));
+}
+
+Scene_Snake::Scene_Snake(GameEngine *gameEngine, const std::string &levelPath) : 
+    Scene(gameEngine), 
+	_rng(_rd()),
     _worldView(gameEngine->window().getDefaultView()) 
 {
     init(levelPath);
@@ -62,6 +96,8 @@ void Scene_Snake::init(const std::string &levelPath) {
 
     spawnPlayer(spawnPos);
 
+    spawnApple();
+
     MusicPlayer::getInstance().play("gameTheme");
     MusicPlayer::getInstance().setVolume(15);
 }
@@ -70,6 +106,7 @@ void Scene_Snake::init(const std::string &levelPath) {
 void Scene_Snake::update(sf::Time dt) {
     sUpdate(dt);
 }
+
 
 void Scene_Snake::sDoAction(const Command &command) {
     // On Key Press
@@ -228,6 +265,13 @@ void Scene_Snake::sRender() {
         _game->window().draw(sprite);
     }
 
+    // Draw the apple
+    if (_apple && _apple->hasComponent<CSprite>())
+    {
+        auto& sprite = _apple->getComponent<CSprite>().sprite;
+        _game->window().draw(sprite);
+    }
+
     // draw pickups
     /*for (auto e: _entityManager.getEntities("Pickup")) {
         drawEntt(e);
@@ -282,6 +326,12 @@ void Scene_Snake::spawnPlayer(sf::Vector2f pos) {
 
     // Create and position the snake sprite
     auto& sprite = _player->addComponent<CSprite>(Assets::getInstance().getTexture("snake")).sprite;
+
+    // Scale the snake sprite to match exactly one grid cell
+    sf::Vector2u textureSize = sprite.getTexture()->getSize();
+    sprite.setScale(_cellSize / textureSize.x, _cellSize / textureSize.y);
+
+    // Set origin to center for proper positioning
     sprite.setOrigin(sprite.getLocalBounds().width / 2.f, sprite.getLocalBounds().height / 2.f);
     sprite.setPosition(pos);
 
@@ -314,8 +364,8 @@ void Scene_Snake::playerMovement() {
 
 
 void Scene_Snake::annimatePlayer() {
-    if (_player->getComponent<CState>().state == "dead")
-        return;
+    /*if (_player->getComponent<CState>().state == "dead")
+        return;*/
 
     //auto pv = _player->getComponent<CTransform>().vel;
     //// implement roll animation, set texture rec accordingly
@@ -457,6 +507,9 @@ void Scene_Snake::sUpdate(sf::Time dt) {
     SoundPlayer::getInstance().removeStoppedSounds();
     _entityManager.update();
     /*_worldView.move(0.f, _config.scrollSpeed * dt.asSeconds() * -1);*/
+
+    updateAppleJitter(dt);
+    _entityManager.update();
 
     /*sAnimation(dt);
     sAutoPilot(dt);*/
@@ -810,8 +863,6 @@ void Scene_Snake::checkIfDead(sPtrEntt e) {
 }
 
 void Scene_Snake::dropPickup(sf::Vector2f pos) {
-    // todo
-
     //static const std::string pickups[] =
     //        {"FireRate", "FireSpread", "HealthRefill", "MissileRefill"};
 

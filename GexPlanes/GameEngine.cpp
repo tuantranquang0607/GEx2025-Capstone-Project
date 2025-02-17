@@ -64,8 +64,8 @@ void GameEngine::loadConfigFromFile(const std::string &path, unsigned int &width
 // Update the game engine
 void GameEngine::update()
 {
-    //sUserInput();
-    //currentScene()->update();
+    sUserInput();
+    currentScene()->update(sf::seconds(1.0f / 60.f));
 }
 
 // Handle user input
