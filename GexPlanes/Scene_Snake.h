@@ -80,7 +80,7 @@ class Scene_Snake : public Scene
     void drawAmmo(sPtrEntt e);                              // Draw the ammo count of an entity
     void drawEntt(sPtrEntt e);                              // Draw an entity
 
-    const int _gridSize = 33;                               // grid size
+    const int _gridSize = 49;                               // grid size
     float _cellSize;                                        // grid cell
 
     std::shared_ptr<Entity> _apple;                         // Reference to the apple entity
@@ -98,6 +98,10 @@ class Scene_Snake : public Scene
     sf::Vector2f getValidApplePosition();                   // Get a valid apple position avoiding walls and the snake
     void checkSnakeCollision();                             // Check if the snake collides with itself or a wall
     void resetSnake();                                      // Respawn the snake in the middle if it dies
+    sf::Text _scoreText;       // SFML text object for displaying score
+    sf::Font _scoreFont;       // Font for the score text
+    void setupScoreDisplay();  // Initializes the score display
+    void updateScoreDisplay(); // Updates the score text
 
 public:
     // Constructor to initialize the planes scene with a game engine and level path

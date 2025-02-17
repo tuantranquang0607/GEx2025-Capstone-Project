@@ -1,6 +1,6 @@
 # level config
 
-World 1200 1200
+World 1400 1400
 
 PlayerSpeed 250
 

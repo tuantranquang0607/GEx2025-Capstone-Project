@@ -13,6 +13,7 @@
 #include <random>
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 
 
 namespace {
@@ -137,6 +138,8 @@ void Scene_Snake::init(const std::string &levelPath) {
 
     MusicPlayer::getInstance().play("gameTheme");
     MusicPlayer::getInstance().setVolume(15);
+
+    setupScoreDisplay();
 }
 
 
@@ -309,6 +312,9 @@ void Scene_Snake::sRender() {
         _game->window().draw(sprite);
     }
 
+    // Draw the score text
+    _game->window().draw(_scoreText);
+
     // draw pickups
     /*for (auto e: _entityManager.getEntities("Pickup")) {
         drawEntt(e);
@@ -374,6 +380,7 @@ void Scene_Snake::spawnPlayer(sf::Vector2f pos) {
 
     _player->addComponent<CState>("straight");
     _player->addComponent<CInput>();
+    _player->addComponent<CScore>(0);
     /*_player->addComponent<CHealth>(100);
     _player->addComponent<CGun>();
     _player->addComponent<CMissiles>();*/
@@ -569,14 +576,14 @@ void Scene_Snake::spawnWalls()
 {
     _walls.clear(); // Remove existing walls if any
 
-    sf::Vector2f wallSize(_cellSize, _cellSize); // Each wall block is 80x80
+    sf::Vector2f wallSize(_cellSize, _cellSize);
 
     for (int x = 0; x < _gridSize; ++x)
     {
         for (int y = 0; y < _gridSize; ++y)
         {
-            // Only place walls at the edges
-            if (x == 0 || x == _gridSize - 1 || y == 0 || y == _gridSize - 1)
+            // Create walls that are 3 cells thick
+            if (x < 2 || x >= _gridSize - 2 || y < 2 || y >= _gridSize - 2)
             {
                 auto wall = _entityManager.addEntity("wall");
                 wall->addComponent<CTransform>(sf::Vector2f(x * _cellSize, y * _cellSize));
@@ -592,6 +599,7 @@ void Scene_Snake::spawnWalls()
     }
 }
 
+
 void Scene_Snake::checkAppleCollision()
 {
     if (!_apple || !_player) return;  // Ensure entities exist
@@ -599,15 +607,27 @@ void Scene_Snake::checkAppleCollision()
     auto& snakeHeadPos = _player->getComponent<CTransform>().pos;
     auto& applePos = _apple->getComponent<CTransform>().pos;
 
-    // If snake head and apple position match (checking within a small margin for precision)
-    if (std::abs(snakeHeadPos.x - applePos.x) < _cellSize * 0.5f &&
-        std::abs(snakeHeadPos.y - applePos.y) < _cellSize * 0.5f)
-    {
+    // Ensure both positions are snapped to the grid
+    sf::Vector2f snakeGridPos(
+        std::round(snakeHeadPos.x / _cellSize) * _cellSize,
+        std::round(snakeHeadPos.y / _cellSize) * _cellSize
+    );
 
-        growSnake();         // Increase snake length
-        spawnApple();        // Respawn the apple at a new position
+    sf::Vector2f appleGridPos(
+        std::round(applePos.x / _cellSize) * _cellSize,
+        std::round(applePos.y / _cellSize) * _cellSize
+    );
+
+    // Check if the snake's head and apple positions match exactly in the grid
+    if (snakeGridPos == appleGridPos)
+    {
+        _player->getComponent<CScore>().score += 5;
+        growSnake();
+        spawnApple();
+        updateScoreDisplay();
     }
 }
+
 
 void Scene_Snake::growSnake()
 {
@@ -669,6 +689,7 @@ sf::Vector2f Scene_Snake::getValidApplePosition()
     return newApplePos;
 }
 
+
 void Scene_Snake::checkSnakeCollision()
 {
     auto& headPos = _player->getComponent<CTransform>().pos;
@@ -710,6 +731,40 @@ void Scene_Snake::resetSnake()
 
     // Reset snake length (just the head at the start)
     _entityManager.update(); // Remove destroyed entities immediately
+}
+
+
+void Scene_Snake::setupScoreDisplay()
+{
+    if (!_scoreFont.loadFromFile("../assets/fonts/sansation.ttf"))
+    {
+        std::cerr << "Failed to load font for score display!\n";
+        return;
+    }
+
+    _scoreText.setFont(_scoreFont);
+    _scoreText.setCharacterSize(static_cast<int>(_cellSize * 1.5)); 
+    _scoreText.setFillColor(sf::Color::White);
+
+    // Adjust the score position to be just inside the top-left wall
+    float marginX = _cellSize * 0;
+    float marginY = _cellSize * -0.5;
+    _scoreText.setPosition(marginX, marginY);
+
+    _scoreText.setString("000"); // Initial score display
+}
+
+
+void Scene_Snake::updateScoreDisplay()
+{
+    if (!_player) return;
+
+    int score = _player->getComponent<CScore>().score;
+
+    std::stringstream ss;
+    ss << std::setw(3) << std::setfill('0') << score;
+
+    _scoreText.setString(ss.str());
 }
 
 
