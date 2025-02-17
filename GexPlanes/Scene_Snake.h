@@ -96,6 +96,8 @@ class Scene_Snake : public Scene
     void checkAppleCollision();                             // Check if the snake eats the apple
     void growSnake();                                       // Increase the snake's length when eating an apple
     sf::Vector2f getValidApplePosition();                   // Get a valid apple position avoiding walls and the snake
+    void checkSnakeCollision();                             // Check if the snake collides with itself or a wall
+    void resetSnake();                                      // Respawn the snake in the middle if it dies
 
 public:
     // Constructor to initialize the planes scene with a game engine and level path

@@ -551,7 +551,8 @@ void Scene_Snake::sUpdate(sf::Time dt) {
     sAutoPilot(dt);*/
     sMovement(dt);
     adjustPlayerPosition();
-    sCollisions();
+    checkSnakeCollision();
+    /*sCollisions();*/
     /*sSpawnEnemies();
     sGunUpdate(dt);
     sGuideMissiles(dt);
@@ -666,6 +667,49 @@ sf::Vector2f Scene_Snake::getValidApplePosition()
         }
     }
     return newApplePos;
+}
+
+void Scene_Snake::checkSnakeCollision()
+{
+    auto& headPos = _player->getComponent<CTransform>().pos;
+
+    // Check collision with walls
+    for (auto& wall : _walls)
+    {
+        if (wall->getComponent<CTransform>().pos == headPos)
+        {
+            resetSnake(); // Reset snake if it hits a wall
+            return;
+        }
+    }
+
+    // Check collision with itself (except head)
+    for (auto& segment : _entityManager.getEntities("snake"))
+    {
+        if (segment->getComponent<CTransform>().pos == headPos)
+        {
+            resetSnake(); // Reset snake if it hits itself
+            return;
+        }
+    }
+}
+
+
+void Scene_Snake::resetSnake()
+{
+    // Remove all snake body parts
+    for (auto& segment : _entityManager.getEntities("snake"))
+    {
+        segment->destroy();
+    }
+
+    // Respawn the snake at the center of the map
+    sf::Vector2f spawnPos((_gridSize / 2) * _cellSize, (_gridSize / 2) * _cellSize);
+    _player->getComponent<CTransform>().pos = spawnPos;
+    _player->getComponent<CSprite>().sprite.setPosition(spawnPos);
+
+    // Reset snake length (just the head at the start)
+    _entityManager.update(); // Remove destroyed entities immediately
 }
 
 
