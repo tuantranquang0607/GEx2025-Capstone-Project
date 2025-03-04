@@ -335,8 +335,8 @@ void Scene_Snake::sRender() {
 }
 
 void Scene_Snake::registerActions() {
-    registerAction(sf::Keyboard::Z, "ZOOMOUT");
-    registerAction(sf::Keyboard::X, "ZOOMIN");
+    /*registerAction(sf::Keyboard::Z, "ZOOMOUT");
+    registerAction(sf::Keyboard::X, "ZOOMIN");*/
 
     registerAction(sf::Keyboard::P, "PAUSE");
     registerAction(sf::Keyboard::Escape, "BACK");
@@ -346,8 +346,8 @@ void Scene_Snake::registerActions() {
     registerAction(sf::Keyboard::T, "TOGGLE_TEXTURE");
     registerAction(sf::Keyboard::V, "TOGGLE_CAMOUTLINE");
 
-    registerAction(sf::Keyboard::Space, "FIRE");
-    registerAction(sf::Keyboard::M, "LAUNCH");
+    /*registerAction(sf::Keyboard::Space, "FIRE");
+    registerAction(sf::Keyboard::M, "LAUNCH");*/
 
     registerAction(sf::Keyboard::A, "LEFT");
     registerAction(sf::Keyboard::Left, "LEFT");
@@ -394,13 +394,31 @@ void Scene_Snake::playerMovement() {
 
     // player movement
     sf::Vector2f pv{0.f, 0.f};
+
     auto &pInput = _player->getComponent<CInput>();
-    if (pInput.left) pv.x -= 1;
-    if (pInput.right) pv.x += 1;
-    if (pInput.up) pv.y -= 1;
-    if (pInput.down) pv.y += 1;
+
+    if (pInput.left) 
+    { 
+        pv.x -= 1;
+    }
+
+    if (pInput.right)
+    {
+        pv.x += 1;
+    }
+
+    if (pInput.up)
+    {
+        pv.y -= 1;
+    }
+
+    if (pInput.down)
+    {
+        pv.y += 1;
+    }
 
     pv = normalize(pv);
+
     _player->getComponent<CTransform>().vel = _config.playerSpeed * pv;
 
     /*annimatePlayer();*/
