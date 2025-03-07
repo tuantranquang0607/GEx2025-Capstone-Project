@@ -83,21 +83,23 @@ class Scene_Snake : public Scene
     const int _gridSize = 49;                               // grid size
     float _cellSize;                                        // grid cell
 
-    std::shared_ptr<Entity> _apple;                         // Reference to the apple entity
-
     // Random number generator
     std::random_device _rd;
     std::mt19937 _rng;
 
     void spawnWalls();                                      // Spawn walls in the scene
     std::vector<std::shared_ptr<Entity>> _walls;            // Store all wall entities
+
 	void spawnApple();      		                        // Spawn an apple in the scene
 	void updateAppleJitter(sf::Time dt);					// Update the apple jitter effect
     void checkAppleCollision();                             // Check if the snake eats the apple
-    void growSnake();                                       // Increase the snake's length when eating an apple
     sf::Vector2f getValidApplePosition();                   // Get a valid apple position avoiding walls and the snake
+
+    std::shared_ptr<Entity> _apple;                         // Reference to the apple entity
+    void growSnake();                                       // Increase the snake's length when eating an apple
     void checkSnakeCollision();                             // Check if the snake collides with itself or a wall
     void resetSnake();                                      // Respawn the snake in the middle if it dies
+
     sf::Text _scoreText;       // SFML text object for displaying score
     sf::Font _scoreFont;       // Font for the score text
     void setupScoreDisplay();  // Initializes the score display

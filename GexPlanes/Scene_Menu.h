@@ -27,6 +27,7 @@ public:
 
     // Render the menu scene
     void sRender() override;
+
     // Handle actions in the menu scene
     void sDoAction(const Command& action) override;
 };
