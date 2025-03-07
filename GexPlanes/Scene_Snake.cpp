@@ -814,6 +814,7 @@ void Scene_Snake::fireBullet() {
         _player->getComponent<CGun>().isFiring = true;*/
 }
 
+
 void Scene_Snake::sGunUpdate(sf::Time dt) {
     //for (auto e: _entityManager.getEntities()) {
     //    if (e->hasComponent<CGun>()) {
