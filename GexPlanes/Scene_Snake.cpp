@@ -381,6 +381,7 @@ void Scene_Snake::spawnPlayer(sf::Vector2f pos) {
     _player->addComponent<CState>("straight");
     _player->addComponent<CInput>();
     _player->addComponent<CScore>(0);
+    _player->addComponent<CDirection>(sf::Vector2f(1.f, 0.f));
     /*_player->addComponent<CHealth>(100);
     _player->addComponent<CGun>();
     _player->addComponent<CMissiles>();*/
@@ -393,31 +394,29 @@ void Scene_Snake::playerMovement() {
         return;
 
     // player movement
-    sf::Vector2f pv{0.f, 0.f};
+    sf::Vector2f pv{1.f, 1.f};
 
-    auto &pInput = _player->getComponent<CInput>();
+    auto& pInput = _player->getComponent<CInput>();
+    auto& direction = _player->getComponent<CDirection>().direction;
 
-    if (pInput.left) 
-    { 
-        pv.x -= 1;
-    }
-
-    if (pInput.right)
+    if (pInput.left)
     {
-        pv.x += 1;
+        direction = sf::Vector2f(-1.f, 0.f); // Move left
     }
-
-    if (pInput.up)
+    else if (pInput.right)
     {
-        pv.y -= 1;
+        direction = sf::Vector2f(1.f, 0.f); // Move right
     }
-
-    if (pInput.down)
+    else if (pInput.up)
     {
-        pv.y += 1;
+        direction = sf::Vector2f(0.f, -1.f); // Move up
+    }
+    else if (pInput.down)
+    {
+        direction = sf::Vector2f(0.f, 1.f); // Move down
     }
 
-    pv = normalize(pv);
+    /*pv = normalize(pv);*/
 
     _player->getComponent<CTransform>().vel = _config.playerSpeed * pv;
 

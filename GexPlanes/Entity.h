@@ -14,7 +14,10 @@
 class EntityManager;
 
 // Define a tuple to hold all possible components
-using ComponentTuple = std::tuple<CShape, CSprite, CMissiles, CGun, CHealth, CState, CAnimation, CTransform, CAutoPilot, CBoundingBox, CInput, CScore>;
+using ComponentTuple = std::tuple
+<
+    CShape, CSprite, CMissiles, CGun, CHealth, CState, CAnimation, CTransform, CAutoPilot, CBoundingBox, CInput, CScore, CDirection
+>;
 
 // Class to represent an entity in the game
 class Entity 

@@ -160,4 +160,14 @@ struct CShape : public Component
     }
 };
 
+// Component for handling directions
+struct CDirection : public Component
+{
+    sf::Vector2f direction{ 1.f, 1.f };
+
+    CDirection() = default;
+    CDirection(const sf::Vector2f& dir) : direction(dir) {}
+};
+
+
 #endif //BREAKOUT_COMPONENTS_H
