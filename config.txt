@@ -1,6 +1,6 @@
 # GameEngine Config
 
-Window  480 600
+Window  900 900
 
 Font    Arial           ../assets/fonts/arial.ttf
 Font    main            ../assets/fonts/Sansation.ttf
@@ -15,8 +15,8 @@ Texture Title           ../assets/Textures/FroggerTitle.png
 Texture Entities        ../assets/Textures/FroggerAtlas.png
 
 # Sprites
-Sprite Background       Background   0 0  480 600
-Sprite Title            Title 0 0 480 600
+Sprite Background       Background   0 0  900 900
+Sprite Title            Title 0 0 900 900
 
 #
 # SOUNDS

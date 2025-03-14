@@ -18,6 +18,8 @@
 //  1. I didnt get abc to work because of xyz, I tried ijk...
 //
 
+// ComponentTuple is in the Entity.h file
+
 
 
 #include <iostream>

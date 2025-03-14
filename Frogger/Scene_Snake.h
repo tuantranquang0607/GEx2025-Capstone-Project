@@ -37,32 +37,24 @@ class Scene_Snake : public Scene {
 	void                    sCollisions();
 	void                    sUpdate(sf::Time dt);
 	void	                onEnd() override;
-	void                    sSpawnMovingEntities();
 	void					sAnimation(sf::Time dt);
 	void					drawScore();
 	void					getScore();
 	void					drawLife();
 	void					spawnLife();
 	void					drawGameOver();
-	void					drawTimer();
 	void					drawWin();
 
 
 
 	// helper functions
-	void                    checkVehicleCollision();
-	void                    checkRiverCollision();
 	void                    init(const std::string& path);
 	void                    loadLevel(const std::string& path);
 	void                    spawnPlayer(sf::Vector2f pos);
 	void                    playerMovement(sf::Time dt);
 	void                    adjustPlayerPosition();
-	void                    spawnEnemyVehicle();
-	void                    adjustVehiclePosition();
-	void                    spawnRiverEntities();
-	void                    adjustRiverEntityPosition();
 	void	                registerActions();
-	void                    checkIfDead(sPtrEntt e);
+	/*void                    checkIfDead(sPtrEntt e);*/
 
 public:
 	Scene_Snake(GameEngine* gameEngine, const std::string& levelPath);

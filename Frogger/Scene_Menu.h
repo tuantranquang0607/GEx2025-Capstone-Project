@@ -10,10 +10,11 @@ private:
 	std::vector<std::string>	_levelPaths;
 	int							_menuIndex{ 0 };
 	std::string					_title;
-
+	sf::Sprite					_backgroundSprite;
 
 	void init();
 	void onEnd() override;
+
 public:
 
 	Scene_Menu(GameEngine* gameEngine);

@@ -28,7 +28,7 @@ void Scene_Menu::init()
 	registerAction(sf::Keyboard::D, "PLAY");
 	registerAction(sf::Keyboard::Escape, "QUIT");
 
-	_title = "FROGGER";
+	_title = "Snappy Snake";
 	_menuStrings.push_back("Level 1");
 	_menuStrings.push_back("Level 2");
 	_menuStrings.push_back("Level 3");
@@ -41,6 +41,15 @@ void Scene_Menu::init()
 
 	const size_t CHAR_SIZE{ 64 };
 	_menuText.setCharacterSize(CHAR_SIZE);
+
+	_backgroundSprite.setTexture(Assets::getInstance().getTexture("logo"));
+
+	sf::Vector2u winSize = _game->window().getSize();
+	sf::Vector2u textureSize = Assets::getInstance().getTexture("logo").getSize();
+	_backgroundSprite.setScale(
+		static_cast<float>(winSize.x) / textureSize.x,
+		static_cast<float>(winSize.y) / textureSize.y
+	);
 
 }
 
@@ -59,7 +68,6 @@ void Scene_Menu::sRender()
 
 	static const sf::Color selectedColor(255, 255, 255);
 	static const sf::Color normalColor(0, 0, 0);
-
 	static const sf::Color backgroundColor(100, 100, 255);
 
 	sf::Text footer("UP: W    DOWN: S   PLAY:D    QUIT: ESC",
