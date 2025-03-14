@@ -45,6 +45,7 @@ void Scene_Menu::init()
 	_backgroundSprite.setTexture(Assets::getInstance().getTexture("logo"));
 
 	sf::Vector2u winSize = _game->window().getSize();
+
 	sf::Vector2u textureSize = Assets::getInstance().getTexture("logo").getSize();
 	_backgroundSprite.setScale(
 		static_cast<float>(winSize.x) / textureSize.x,
@@ -76,6 +77,7 @@ void Scene_Menu::sRender()
 	footer.setPosition(32, 530);
 
 	_game->window().clear(backgroundColor);
+	_game->window().draw(_backgroundSprite);
 
 	_menuText.setFillColor(normalColor);
 	_menuText.setString(_title);
@@ -92,7 +94,6 @@ void Scene_Menu::sRender()
 
 	_game->window().draw(footer);
 	//m_game->window().display();
-
 }
 
 

@@ -297,4 +297,5 @@ void Assets::loadFromFile(const std::string path) {
     loadSounds(path);
     loadJson(path);
     loadAnimations(path);  // requires loadJson be run first
+    /*addTexture("logo", "../assets/Textures/logo.png");*/
 }
