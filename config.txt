@@ -10,7 +10,7 @@ Music gameTheme         ../assets/Music/frogger.ogg
 Music missionTheme      ../assets/Music/tweener.ogg
 
 # Textures
-Texture Background      ../assets/Textures/background.png
+Texture Background      ../assets/Textures/background.png  yes
 Texture Title           ../assets/Textures/FroggerTitle.png
 Texture Entities        ../assets/Textures/FroggerAtlas.png
 Texture logo 		../assets/Textures/logo.png
