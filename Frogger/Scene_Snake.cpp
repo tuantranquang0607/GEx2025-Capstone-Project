@@ -204,7 +204,7 @@ void Scene_Snake::playerMovement(sf::Time dt)
 
 	if (pv != sf::Vector2f(0, 0)) {
 		pos += pv;
-		std::cout << "Frog x " << pos.x << " Frog y " << pos.y << "\n";
+		std::cout << "Snake x " << pos.x << " Snake y " << pos.y << "\n";
 	}
 
 }
@@ -254,6 +254,12 @@ void Scene_Snake::loadLevel(const std::string& path)
 			auto& sprite = e->addComponent<CSprite>(Assets::getInstance().getTexture(name)).sprite;
 			sprite.setOrigin(0.f, 0.f);
 			sprite.setPosition(pos);
+
+			sf::Vector2u windowSize = _game->window().getSize();
+			sf::Vector2u textureSize = Assets::getInstance().getTexture(name).getSize();
+			float scaleX = static_cast<float>(windowSize.x) / textureSize.x;
+			float scaleY = static_cast<float>(windowSize.y) / textureSize.y;
+			sprite.setScale(scaleX, scaleY);
 		}
 		else if (token == "World") {
 			config >> _worldBounds.width >> _worldBounds.height;

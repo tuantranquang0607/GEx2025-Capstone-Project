@@ -3,5 +3,5 @@
 World 900 900
 
 
-Bkg Background 0 0
+Bkg Background 0 0 
 

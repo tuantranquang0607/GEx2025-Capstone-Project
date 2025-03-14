@@ -18,7 +18,7 @@ Texture logo 		../assets/Textures/logo.png
 
 # Sprites
 Sprite Background       Background   0 0  900 900
-Sprite Title            Title 0 0 900 900
+Sprite Title            Title 	     0 0  900 900
 
 #
 # SOUNDS
