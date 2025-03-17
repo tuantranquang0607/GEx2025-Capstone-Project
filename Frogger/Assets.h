@@ -38,7 +38,6 @@ private:
     std::map<std::string, sf::Texture>                          m_textures;
     std::map<std::string, Sprite>                               m_spriteMap;
     std::map<std::string, std::unique_ptr<sf::SoundBuffer>>     m_soundEffects;
-    std::map<std::string, Animation>                            m_animationMap;
     std::map<std::string, std::vector<sf::IntRect>>             m_frameSets;
 
 
@@ -46,8 +45,6 @@ private:
     void loadTextures(const std::string& path);
     void loadSprts(const std::string& path);
     void loadSounds(const std::string& path);
-    void loadJson(const std::string& path);
-    void loadAnimations(const std::string& path);
 
 public:
     void loadFromFile(const std::string path);
@@ -60,7 +57,6 @@ public:
     const sf::SoundBuffer&      getSound(const std::string &fontName) const;
     const sf::Texture&          getTexture(const std::string& textureName) const;
     const Sprite&               getSprt(const std::string& sprtName) const;
-    const Animation&            getAnimation(const std::string& name) const;
 
 };
 

@@ -20,14 +20,6 @@ struct Component
 };
 
 
-struct CAnimation : public Component {
-    Animation   animation;
-
-    CAnimation() = default;
-    CAnimation(const Animation& a) : animation(a) {}
-
-};
-
 struct CSprite : public Component {
     sf::Sprite sprite;
 

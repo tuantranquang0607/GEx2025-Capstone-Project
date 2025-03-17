@@ -11,9 +11,8 @@ Music missionTheme      ../assets/Music/tweener.ogg
 
 # Textures
 Texture Background      ../assets/Textures/background.png  
-Texture Title           ../assets/Textures/FroggerTitle.png
-Texture Entities        ../assets/Textures/FroggerAtlas.png
 Texture logo 		../assets/Textures/logo.png
+Texture snake		../assets/Textures/snake.png
 
 
 # Sprites
@@ -25,7 +24,6 @@ Sprite Title            Title 	     0 0  900 900
 Sound death             ../assets/Sound/froggerDie.wav
 Sound hop               ../assets/Sound/froggerMove.wav
 
-JSON                    ../assets/Textures/FroggerAtlas.json
 
 
 #
@@ -36,20 +34,4 @@ Animation       left            Entities    8        no
 Animation       right           Entities    8        no
 Animation       die             Entities    8        no
 
-Animation       2turtles        Entities    1        yes
-Animation       3turtles        Entities    1        yes
-Animation       tree1           Entities    1        no
-Animation       tree2           Entities    1        no
-
-Animation       car             Entities    1        no
-Animation       raceCarL        Entities    1        no
-Animation       raceCarR        Entities    1        no
-Animation       truck           Entities    1        no
-Animation       tractor         Entities    1        no
-
-Animation       bugIcon         Entities    1        no
-Animation       croc            Entities    1        yes
-Animation       crocIcon        Entities    1        no
-Animation       frogIcon        Entities    1        no
-Animation       lillyPad        Entities    1        no
 Animation       lives           Entities    1        no
