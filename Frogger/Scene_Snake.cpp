@@ -32,7 +32,6 @@ void Scene_Snake::init(const std::string& levelPath) {
 	sf::Vector2f spawnPos{ _game->windowSize().x / 2.f, _game->windowSize().y - 20.f };
 
 	spawnPlayer(spawnPos);
-	spawnLife();
 
 	MusicPlayer::getInstance().play("gameTheme");
 	MusicPlayer::getInstance().setVolume(100);
@@ -41,17 +40,12 @@ void Scene_Snake::init(const std::string& levelPath) {
 
 void Scene_Snake::update(sf::Time dt)
 {
-	if (_lives > 0 && !_isFinish)
-		_timer -= dt.asSeconds();
-
-	if (_timer <= 0.f) {
+	if (_lives < 1)
+	{ 
 		_player->addComponent<CAnimation>(Assets::getInstance().getAnimation("die"));
 		SoundPlayer::getInstance().play("death", _player->getComponent<CTransform>().pos);
-		_lives--;
-		if (_player->getComponent<CTransform>().pos == _player->getComponent<CTransform>().pos) {
-			_timer = _timerThreshold;
-		}
 	}
+		
 	sUpdate(dt);
 }
 
@@ -91,19 +85,10 @@ void Scene_Snake::sRender()
 
 	drawScore();
 
-	drawLife();
-
-	if (_scoreTotal == _winningScore && _lives > 0) 
-	{
-		drawWin();
-		_isFinish = true;
-		return;
-	}
 
 	if (_lives < 1) 
 	{
 		drawGameOver();
-		drawLife();
 		return;
 	}
 
@@ -440,38 +425,4 @@ void Scene_Snake::drawWin() {
 	_game->window().draw(textEsc);
 }
 
-
-void Scene_Snake::drawLife() {
-
-	for (auto e : _entityManager.getEntities("life")) {
-		auto& anim = e->getComponent<CAnimation>().animation;
-		auto& tfm = e->getComponent<CTransform>();
-		auto originalPos = tfm.pos;
-
-		if (_lives == 0) {
-			e->destroy();
-			return;
-		}
-
-		for (int i = 0; i < _lives; ++i) {
-			sf::Vector2f newPos = originalPos;
-			newPos.x += i * 20.f;
-			anim.getSprite().setPosition(newPos);
-			_game->window().draw(anim.getSprite());
-		}
-	}
-
-}
-
-void Scene_Snake::spawnLife() {
-
-	sf::Vector2f pos{ 20.f, 50.f };
-
-	auto life = _entityManager.addEntity("life");
-	life->addComponent<CTransform>(pos, sf::Vector2f(0.f, 0.f));
-
-	auto sprite = life->addComponent<CAnimation>(Assets::getInstance()
-		.getAnimation("lives")).animation.getSprite();
-
-}
 

@@ -17,19 +17,16 @@ class Scene_Snake : public Scene {
 	sPtrEntt				_player{ nullptr };
 	sf::FloatRect           _worldBounds;
 
-	int						_lives{ 5 };
+	int						_lives{ 1 };
 	int						_score{ 0 };
 	int						_scoreTotal{ 0 };
 	int						_scoredHeights[11] = {};
-	int						_winningScore{ 550 };
 
 	bool					_isFinish = false;
 	bool					_isComplete = false;
 	bool                    _drawTextures{ true };
 	bool                    _drawAABB{ false };
 	bool                    _drawCam{ false };
-	float					_timer = 90.f;
-	const float				_timerThreshold = 90.f;
 
 
 	//systems
@@ -40,8 +37,6 @@ class Scene_Snake : public Scene {
 	void					sAnimation(sf::Time dt);
 	void					drawScore();
 	void					getScore();
-	void					drawLife();
-	void					spawnLife();
 	void					drawGameOver();
 	void					drawWin();
 
