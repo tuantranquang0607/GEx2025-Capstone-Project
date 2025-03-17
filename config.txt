@@ -1,21 +1,37 @@
-# Game Config
+# GameEngine Config
 
 Window  900 900
 
+Font    Arial           ../assets/fonts/arial.ttf
+Font    main            ../assets/fonts/Sansation.ttf
+Font    Arcade          ../assets/fonts/arcadeclassic.regular.ttf
 
-Font main ../assets/fonts/sansation.ttf
+Music gameTheme         ../assets/Music/frogger.ogg
+Music missionTheme      ../assets/Music/tweener.ogg
 
-
-Music gameTheme         ../assets/Music/theme.wav
-Music menuTheme      	../assets/Music/8bitTheme.ogg
-
-
-SoundEffect appleHit 	../assets/Sounds/pop.wav
-
-
-Texture background      ../assets/Textures/background.png
-Texture snake           ../assets/Textures/snake.png
-Texture apple        	../assets/Textures/apple.png
+# Textures
+Texture Background      ../assets/Textures/background.png  
+Texture logo 		../assets/Textures/logo.png
+Texture snake		../assets/Textures/snake.png
 
 
-Sprite background	Background  0 0  1200 1200
+# Sprites
+Sprite Background       Background   0 0  900 900
+Sprite Title            Title 	     0 0  900 900
+
+#
+# SOUNDS
+Sound death             ../assets/Sound/froggerDie.wav
+Sound hop               ../assets/Sound/froggerMove.wav
+
+
+
+#
+#  Animation    Name            Texture     Speed   Repeats
+Animation       up              Entities    8        yes
+Animation       down            Entities    8        no
+Animation       left            Entities    8        no
+Animation       right           Entities    8        no
+Animation       die             Entities    8        no
+
+Animation       lives           Entities    1        no
