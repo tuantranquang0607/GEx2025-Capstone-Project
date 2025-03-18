@@ -119,49 +119,52 @@ void Scene_Snake::sRender()
 // Process input commands (actions) from the user.
 void Scene_Snake::sDoAction(const Command& command)
 {
-	// If the action is a key press ("START" type)
+	// Compute grid cell size (you could store gridCount as a member variable for convenience)
+	int gridCount = 31; // Change as needed
+	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
+
 	if (command.type() == "START")
 	{
 		if (command.name() == "PAUSE")
 		{
-			setPaused(!_isPaused);  // Toggle the pause state.
+			setPaused(!_isPaused);
 		}
 		else if (command.name() == "QUIT")
 		{
-			_game->quitLevel();     // Quit the current level.
+			_game->quitLevel();
 		}
 		else if (command.name() == "BACK")
 		{
-			_game->backLevel();     // Return to the previous scene or menu.
+			_game->backLevel();
 		}
 		else if (command.name() == "TOGGLE_TEXTURE")
 		{
-			_drawTextures = !_drawTextures;  // Toggle texture drawing (for debugging).
+			_drawTextures = !_drawTextures;
 		}
 		else if (command.name() == "TOGGLE_COLLISION")
 		{
-			_drawAABB = !_drawAABB;  // Toggle drawing collision boxes.
+			_drawAABB = !_drawAABB;
 		}
 		else if (command.name() == "TOGGLE_CAMOUTLINE")
 		{
-			_drawCam = !_drawCam;    // Toggle drawing camera outlines (if implemented).
+			_drawCam = !_drawCam;
 		}
-		// Handle player movement commands.
+		// Update velocity based on directional input:
 		else if (command.name() == "LEFT")
 		{
-			_player->getComponent<CInput>().dir |= CInput::dirs::LEFT;
+			_player->getComponent<CTransform>().vel = sf::Vector2f(-gridSize, 0);
 		}
 		else if (command.name() == "RIGHT")
 		{
-			_player->getComponent<CInput>().dir |= CInput::dirs::RIGHT;
+			_player->getComponent<CTransform>().vel = sf::Vector2f(gridSize, 0);
 		}
 		else if (command.name() == "UP")
 		{
-			_player->getComponent<CInput>().dir |= CInput::dirs::UP;
+			_player->getComponent<CTransform>().vel = sf::Vector2f(0, -gridSize);
 		}
 		else if (command.name() == "DOWN")
 		{
-			_player->getComponent<CInput>().dir |= CInput::dirs::DOWN;
+			_player->getComponent<CTransform>().vel = sf::Vector2f(0, gridSize);
 		}
 	}
 	// If the action is a key release ("END" type), reset the player's movement direction.
@@ -212,36 +215,21 @@ void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 	// Make sure "snake" is loaded via your config.txt.
 	auto& sprite = _player->addComponent<CSprite>(Assets::getInstance().getTexture("snake")).sprite;
 
-	// Center the sprite's origin for proper positioning and rotation.
-	centerOrigin(sprite);
-
-	// ---- New Code for Scaling the Snake to Match the Grid Cell ----
-
-	// Define the grid count (number of cells per row/column). 
-	// This should match your game's current grid. For instance, if you changed your grid to 50×50:
-	int gridCount = 31;  // Change this to 21 if you want a 21×21 grid, or set it dynamically.
-
-	// Compute the grid cell size. We assume a square window, so both width and height are the same.
-	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
-
-	// Get the snake sprite's original size (its local bounds)
 	sf::FloatRect bounds = sprite.getLocalBounds();
 
-	// Calculate the scale factor so that the sprite's width becomes equal to gridSize.
-	// (If your snake image isn't square, you can compute separate factors for x and y.)
-	float scaleFactor = gridSize / bounds.width;
+	// Resize snake to match one grid cell (assuming you already scale it accordingly)
+	// [Your existing scaling code might be here]
 
-	// Apply the scaling factor to the sprite.
-	sprite.setScale(scaleFactor, scaleFactor);
-
-	// ---- End of New Scaling Code ----
-
-	// Recalculate the snake's bounding box using the scaled sprite's global bounds.
+	// Set up the bounding box using the sprite's current size
 	sf::FloatRect scaledBounds = sprite.getGlobalBounds();
 	_player->addComponent<CBoundingBox>(sf::Vector2f(scaledBounds.width, scaledBounds.height));
 
-	// Set the player's state to "Alive"
 	_player->addComponent<CState>().state = "Alive";
+
+	// Set initial velocity: assume moving upward.
+	int gridCount = 21; // Or get it dynamically if needed.
+	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
+	_player->getComponent<CTransform>().vel = sf::Vector2f(0, -gridSize);
 }
 
 // Handle the player's movement based on input and update the position accordingly.
