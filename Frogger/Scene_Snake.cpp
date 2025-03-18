@@ -80,7 +80,7 @@ void Scene_Snake::sRender()
 		// Get the entity's animation component and its transform.
 		auto& tfm = e->getComponent<CTransform>();
 
-		// Draw the sprite if the entity has one
+		// Draw the entity's sprite if it has one.
 		if (e->hasComponent<CSprite>())
 		{
 			auto& sprite = e->getComponent<CSprite>().sprite;
@@ -202,65 +202,90 @@ void Scene_Snake::registerActions()
 // Spawn the player entity at the specified position.
 void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 {
-	// Create a new entity with tag "player".
+	// Create the player entity with tag "player"
 	_player = _entityManager.addEntity("player");
 
-	// Add a transform component to position the player at 'pos'.
+	// Add a transform component and initialize it with the spawn position
 	_player->addComponent<CTransform>(pos);
 
-	// Add a sprite component that uses the "snake" texture.
-	// Make sure that the "snake" texture is loaded (e.g., via your config or addTexture call).
+	// Add a sprite component using the "snake" texture.
+	// Make sure "snake" is loaded via your config.txt.
 	auto& sprite = _player->addComponent<CSprite>(Assets::getInstance().getTexture("snake")).sprite;
 
-	// Center the sprite's origin for proper rotation/movement.
+	// Center the sprite's origin for proper positioning and rotation.
 	centerOrigin(sprite);
 
-	// Obtain the sprite's local bounds to create a bounding box for collision detection.
-	sf::FloatRect bounds = sprite.getLocalBounds();
-	_player->addComponent<CBoundingBox>(sf::Vector2f(bounds.width, bounds.height));
+	// ---- New Code for Scaling the Snake to Match the Grid Cell ----
 
-	// Add a state component and mark the player as "Alive".
+	// Define the grid count (number of cells per row/column). 
+	// This should match your game's current grid. For instance, if you changed your grid to 50×50:
+	int gridCount = 31;  // Change this to 21 if you want a 21×21 grid, or set it dynamically.
+
+	// Compute the grid cell size. We assume a square window, so both width and height are the same.
+	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
+
+	// Get the snake sprite's original size (its local bounds)
+	sf::FloatRect bounds = sprite.getLocalBounds();
+
+	// Calculate the scale factor so that the sprite's width becomes equal to gridSize.
+	// (If your snake image isn't square, you can compute separate factors for x and y.)
+	float scaleFactor = gridSize / bounds.width;
+
+	// Apply the scaling factor to the sprite.
+	sprite.setScale(scaleFactor, scaleFactor);
+
+	// ---- End of New Scaling Code ----
+
+	// Recalculate the snake's bounding box using the scaled sprite's global bounds.
+	sf::FloatRect scaledBounds = sprite.getGlobalBounds();
+	_player->addComponent<CBoundingBox>(sf::Vector2f(scaledBounds.width, scaledBounds.height));
+
+	// Set the player's state to "Alive"
 	_player->addComponent<CState>().state = "Alive";
 }
 
 // Handle the player's movement based on input and update the position accordingly.
 void Scene_Snake::playerMovement(sf::Time dt)
 {
+	// Compute grid cell size based on the window width (21 columns)
+	float gridSize = static_cast<float>(_game->window().getSize().x) / 31.f;
 
-	sf::Vector2f pv;  // Initialize a vector to accumulate movement delta.
-	auto& pos = _player->getComponent<CTransform>().pos;  // Get a reference to the player's current position.
+	// Initialize movement vector
+	sf::Vector2f movementDelta(0.f, 0.f);
+	auto& pos = _player->getComponent<CTransform>().pos;  // Get player's current position
 
-	// Check the input direction flags and move accordingly.
+	// Check input directions (assuming your input system uses bit flags:
+	// 1 for UP, 2 for DOWN, 4 for LEFT, 8 for RIGHT)
 	if (_player->getComponent<CInput>().dir == 1)
 	{ // UP
-		pv.y -= 40.f;  // Move upward.
-		_player->getComponent<CInput>().dir = 0;  // Reset input direction.
-		SoundPlayer::getInstance().play("hop", pos);  // Play hop sound effect.
+		movementDelta.y -= gridSize;
+		_player->getComponent<CInput>().dir = 0;  // Reset input flag
+		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 2)
 	{ // DOWN
-		pv.y += 40.f;  // Move downward.
+		movementDelta.y += gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 4)
 	{ // LEFT
-		pv.x -= 40.f;  // Move left.
+		movementDelta.x -= gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 8)
 	{ // RIGHT
-		pv.x += 40.f;  // Move right.
+		movementDelta.x += gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 
-	// If any movement occurred, update the player's position.
-	if (pv != sf::Vector2f(0, 0))
+	// If movement occurred, update the player's position by exactly one grid cell.
+	if (movementDelta != sf::Vector2f(0.f, 0.f))
 	{
-		pos += pv;
-		std::cout << "Snake x " << pos.x << " Snake y " << pos.y << "\n";  // Debug output for new position.
+		pos += movementDelta;
+		std::cout << "Snake moved to (" << pos.x << ", " << pos.y << ")\n";
 	}
 }
 
