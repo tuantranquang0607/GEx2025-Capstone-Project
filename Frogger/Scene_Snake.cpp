@@ -294,6 +294,33 @@ void Scene_Snake::checkWallCollision()
 	}
 }
 
+void Scene_Snake::checkAppleCollision()
+{
+	if (!_player->hasComponent<CBoundingBox>())
+		return;
+
+	for (auto& apple : _entityManager.getEntities("apple"))
+	{
+		if (!apple->hasComponent<CBoundingBox>())
+			continue;
+
+		sf::Vector2f overlap = Physics::getOverlap(_player, apple);
+
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			std::cout << "Apple collision detected!\n";
+			_scoreTotal += 10;
+
+			apple->destroy();
+
+			spawnApple();
+
+			break;
+		}
+	}
+
+}
+
 void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 {
 	_player = _entityManager.addEntity("player");
@@ -440,6 +467,7 @@ void Scene_Snake::sMovement(sf::Time dt)
 void Scene_Snake::sCollisions()
 {
 	checkWallCollision();
+	checkAppleCollision();
 }
 
 void Scene_Snake::sUpdate(sf::Time dt)

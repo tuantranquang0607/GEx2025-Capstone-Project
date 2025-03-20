@@ -54,6 +54,7 @@ class Scene_Snake : public Scene
 	void spawnWalls();                                  // Spawns a wall entity in the game world
 	void spawnApple();                                  // Spawns an apple entity in the game world
 	void checkWallCollision();                          // Checks for collisions between the player and walls
+	void checkAppleCollision();                         // Checks for collisions between the player and apples
 
 
     int gridCount = 31;  
