@@ -13,6 +13,7 @@ Music missionTheme      ../assets/Music/tweener.ogg
 Texture Background      ../assets/Textures/background.png  
 Texture logo 		../assets/Textures/logo.png
 Texture snake		../assets/Textures/snake.png
+Texture wall		../assets/Textures/wall.png	
 
 
 # Sprites
