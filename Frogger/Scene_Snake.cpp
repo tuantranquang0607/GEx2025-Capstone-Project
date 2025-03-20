@@ -232,6 +232,8 @@ void Scene_Snake::spawnWalls()
 		sprite.setScale(scaleX, scaleY);
 		wall->addComponent<CBoundingBox>(sf::Vector2f(gridSize, gridSize));
 	}
+
+	std::cout << "Walls spawned\n";
 }
 
 void Scene_Snake::spawnApple()
@@ -265,6 +267,8 @@ void Scene_Snake::spawnApple()
 	sprite.setScale(scaleX, scaleY);
 
 	apple->addComponent<CBoundingBox>(sf::Vector2f(cellSize, cellSize));
+
+	std::cout << "Apple spawned at (" << pos.x << ", " << pos.y << ")\n";
 }
 
 void Scene_Snake::checkWallCollision()
@@ -293,20 +297,24 @@ void Scene_Snake::checkWallCollision()
 void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 {
 	_player = _entityManager.addEntity("player");
-
 	_player->addComponent<CTransform>(pos);
 
 	auto& sprite = _player->addComponent<CSprite>(Assets::getInstance().getTexture("snake")).sprite;
 
-	sf::FloatRect bounds = sprite.getLocalBounds();
+	centerOrigin(sprite);
 
-	sf::FloatRect scaledBounds = sprite.getGlobalBounds();
-	_player->addComponent<CBoundingBox>(sf::Vector2f(scaledBounds.width, scaledBounds.height));
+	int gridCount = 31;
+	float cellSize = static_cast<float>(_game->window().getSize().x) / gridCount;
+
+	float scaleX = cellSize / sprite.getLocalBounds().width;
+	float scaleY = cellSize / sprite.getLocalBounds().height;
+	sprite.setScale(scaleX, scaleY);
+
+	sf::FloatRect newBounds = sprite.getGlobalBounds();
+	_player->addComponent<CBoundingBox>(sf::Vector2f(newBounds.width, newBounds.height));
 
 	_player->addComponent<CState>().state = "Alive";
 
-	int gridCount = 21;
-	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
 	_player->getComponent<CTransform>().vel = sf::Vector2f(0, -gridSize);
 }
 
@@ -314,37 +322,37 @@ void Scene_Snake::playerMovement(sf::Time dt)
 {
 	float gridSize = static_cast<float>(_game->window().getSize().x) / 31.f;
 
-	sf::Vector2f movementDelta(0.f, 0.f);
+	sf::Vector2f movement(0.f, 0.f);
 	auto& pos = _player->getComponent<CTransform>().pos;
 
 	if (_player->getComponent<CInput>().dir == 1)
 	{
-		movementDelta.y -= gridSize;
+		movement.y -= gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 2)
 	{
-		movementDelta.y += gridSize;
+		movement.y += gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 4)
 	{
-		movementDelta.x -= gridSize;
+		movement.x -= gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 8)
 	{
-		movementDelta.x += gridSize;
+		movement.x += gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 
-	if (movementDelta != sf::Vector2f(0.f, 0.f))
+	if (movement != sf::Vector2f(0.f, 0.f))
 	{
-		pos += movementDelta;
+		pos += movement;
 		std::cout << "Snake moved to (" << pos.x << ", " << pos.y << ")\n";
 	}
 }
