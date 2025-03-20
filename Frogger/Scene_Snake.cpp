@@ -32,6 +32,7 @@ void Scene_Snake::init(const std::string& levelPath)
 
 	spawnPlayer(spawnPos);
 	spawnWalls();
+	spawnApple();
 
 	MusicPlayer::getInstance().play("gameTheme");
 	MusicPlayer::getInstance().setVolume(100);
@@ -230,6 +231,39 @@ void Scene_Snake::spawnWalls()
 		sprite.setScale(scaleX, scaleY);
 		wall->addComponent<CBoundingBox>(sf::Vector2f(gridSize, gridSize));
 	}
+}
+
+void Scene_Snake::spawnApple()
+{
+	float cellSize = static_cast<float>(_game->window().getSize().x) / gridCount;
+
+	std::uniform_int_distribution<int> dist(1, gridCount - 2);
+
+	int cellX = dist(rng);
+	int cellY = dist(rng);
+
+	sf::Vector2f pos(cellX * cellSize + cellSize / 2.f, cellY * cellSize + cellSize / 2.f);
+	sf::Vector2f snakePos = _player->getComponent<CTransform>().pos;
+
+	int snakeCellX = static_cast<int>(snakePos.x / cellSize);
+	int snakeCellY = static_cast<int>(snakePos.y / cellSize);
+
+	if (snakeCellX == cellX && snakeCellY == cellY)
+	{
+		spawnApple();
+		return;
+	}
+
+	auto apple = _entityManager.addEntity("apple");
+	apple->addComponent<CTransform>(pos);
+	auto& sprite = apple->addComponent<CSprite>(Assets::getInstance().getTexture("apple")).sprite;
+	centerOrigin(sprite);
+
+	float scaleX = cellSize / sprite.getLocalBounds().width;
+	float scaleY = cellSize / sprite.getLocalBounds().height;
+	sprite.setScale(scaleX, scaleY);
+
+	apple->addComponent<CBoundingBox>(sf::Vector2f(cellSize, cellSize));
 }
 
 void Scene_Snake::spawnPlayer(sf::Vector2f pos)
