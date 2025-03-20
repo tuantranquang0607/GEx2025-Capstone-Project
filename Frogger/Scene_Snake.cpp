@@ -6,6 +6,7 @@
 #include "Assets.h"
 #include "SoundPlayer.h"
 #include "GameEngine.h"
+#include "Scene_Menu.h"
 
 #include <random>
 #include <fstream>
@@ -266,6 +267,29 @@ void Scene_Snake::spawnApple()
 	apple->addComponent<CBoundingBox>(sf::Vector2f(cellSize, cellSize));
 }
 
+void Scene_Snake::checkWallCollision()
+{
+	if (!_player->hasComponent<CBoundingBox>())
+		return;
+
+	for (auto& wall : _entityManager.getEntities("wall"))
+	{
+        if (!wall->hasComponent<CBoundingBox>())
+		{
+			continue;
+		}
+		
+		sf::Vector2f overlap = Physics::getOverlap(_player, wall);
+
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			std::cout << "Collision with wall detected! Resetting game to menu.\n";
+			_game->changeScene("MENU", std::make_shared<Scene_Menu>(_game), true);
+			return;
+		}
+	}
+}
+
 void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 {
 	_player = _entityManager.addEntity("player");
@@ -407,6 +431,7 @@ void Scene_Snake::sMovement(sf::Time dt)
 
 void Scene_Snake::sCollisions()
 {
+	checkWallCollision();
 }
 
 void Scene_Snake::sUpdate(sf::Time dt)
