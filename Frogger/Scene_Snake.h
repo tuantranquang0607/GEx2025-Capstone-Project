@@ -52,8 +52,12 @@ class Scene_Snake : public Scene
     void adjustPlayerPosition();                        // Ensures the player stays within defined game boundaries
     void registerActions();                             // Sets up input actions (keyboard mappings) for this scene
     /*void checkIfDead(sPtrEntt e);*/                   // (Commented out) Optionally checks if a given entity is "dead" (e.g., collided)
+	void spawnWalls();                                  // Spawns a wall entity in the game world
+	void spawnApple();                                  // Spawns an apple entity in the game world
 
-    float gridSize = static_cast<float>(_game->window().getSize().x) / 31.f;
+
+    int gridCount = 31;  
+    float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
 
 public:
     // Constructor: Initializes the Scene_Snake instance with a pointer to the GameEngine and the level file path.
