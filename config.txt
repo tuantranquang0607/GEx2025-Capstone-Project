@@ -31,11 +31,11 @@ Sound hop               ../assets/Sound/froggerMove.wav
 
 
 #
-#  Animation    Name            Texture     Speed   Repeats
-Animation       up              Entities    8        yes
-Animation       down            Entities    8        no
-Animation       left            Entities    8        no
-Animation       right           Entities    8        no
-Animation       die             Entities    8        no
+#  Animation    Name            Texture        Repeats
+Animation       up              Entities          yes
+Animation       down            Entities          no
+Animation       left            Entities          no
+Animation       right           Entities          no
+Animation       die             Entities          no
 
 Animation       lives           Entities    1        no

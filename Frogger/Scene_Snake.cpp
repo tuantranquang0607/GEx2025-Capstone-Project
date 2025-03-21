@@ -6,6 +6,7 @@
 #include "Assets.h"
 #include "SoundPlayer.h"
 #include "GameEngine.h"
+#include "Scene_Menu.h"
 
 #include <random>
 #include <fstream>
@@ -17,9 +18,11 @@ namespace
 	std::mt19937 rng(rd());
 }
 
-Scene_Snake::Scene_Snake(GameEngine* gameEngine, const std::string& levelPath)
-	: Scene(gameEngine)
+Scene_Snake::Scene_Snake(GameEngine* gameEngine, const std::string& levelPath) : Scene(gameEngine)
 {
+	gridCount = 31;
+	gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
+
 	init(levelPath);
 }
 
@@ -33,6 +36,8 @@ void Scene_Snake::init(const std::string& levelPath)
 	spawnPlayer(spawnPos);
 	spawnWalls();
 	spawnApple();
+	spawnOrange();
+	spawnBlueberry();
 
 	MusicPlayer::getInstance().play("gameTheme");
 	MusicPlayer::getInstance().setVolume(100);
@@ -100,9 +105,6 @@ void Scene_Snake::sRender()
 
 void Scene_Snake::sDoAction(const Command& command)
 {
-	int gridCount = 31;
-	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
-
 	if (command.type() == "START")
 	{
 		if (command.name() == "PAUSE")
@@ -231,22 +233,22 @@ void Scene_Snake::spawnWalls()
 		sprite.setScale(scaleX, scaleY);
 		wall->addComponent<CBoundingBox>(sf::Vector2f(gridSize, gridSize));
 	}
+
+	std::cout << "Walls spawned\n";
 }
 
 void Scene_Snake::spawnApple()
 {
-	float cellSize = static_cast<float>(_game->window().getSize().x) / gridCount;
-
 	std::uniform_int_distribution<int> dist(1, gridCount - 2);
 
 	int cellX = dist(rng);
 	int cellY = dist(rng);
 
-	sf::Vector2f pos(cellX * cellSize + cellSize / 2.f, cellY * cellSize + cellSize / 2.f);
+	sf::Vector2f pos(cellX * gridSize + gridSize / 2.f, cellY * gridSize + gridSize / 2.f);
 	sf::Vector2f snakePos = _player->getComponent<CTransform>().pos;
 
-	int snakeCellX = static_cast<int>(snakePos.x / cellSize);
-	int snakeCellY = static_cast<int>(snakePos.y / cellSize);
+	int snakeCellX = static_cast<int>(snakePos.x / gridSize);
+	int snakeCellY = static_cast<int>(snakePos.y / gridSize);
 
 	if (snakeCellX == cellX && snakeCellY == cellY)
 	{
@@ -259,30 +261,225 @@ void Scene_Snake::spawnApple()
 	auto& sprite = apple->addComponent<CSprite>(Assets::getInstance().getTexture("apple")).sprite;
 	centerOrigin(sprite);
 
-	float scaleX = cellSize / sprite.getLocalBounds().width;
-	float scaleY = cellSize / sprite.getLocalBounds().height;
+	float scaleX = gridSize / sprite.getLocalBounds().width;
+	float scaleY = gridSize / sprite.getLocalBounds().height;
 	sprite.setScale(scaleX, scaleY);
 
-	apple->addComponent<CBoundingBox>(sf::Vector2f(cellSize, cellSize));
+	apple->addComponent<CBoundingBox>(sf::Vector2f(gridSize, gridSize));
+
+	std::cout << "Apple spawned at (" << pos.x << ", " << pos.y << ")\n";
+}
+
+void Scene_Snake::spawnOrange()
+{
+	// Random cell from 1 to gridCount - 2 (to avoid the walls)
+	std::uniform_int_distribution<int> dist(1, gridCount - 2);
+	int cellX = dist(rng);
+	int cellY = dist(rng);
+
+	if (isCellOccupied(cellX, cellY, gridSize))
+	{
+		spawnOrange(); // Try a new random position.
+		return;
+	}
+
+	sf::Vector2f pos(cellX * gridSize + gridSize / 2.f, cellY * gridSize + gridSize / 2.f);
+	auto orange = _entityManager.addEntity("orange");
+	orange->addComponent<CTransform>(pos);
+	auto& sprite = orange->addComponent<CSprite>(Assets::getInstance().getTexture("orange")).sprite;
+	centerOrigin(sprite);
+	float scaleX = gridSize / sprite.getLocalBounds().width;
+	float scaleY = gridSize / sprite.getLocalBounds().height;
+	sprite.setScale(scaleX, scaleY);
+	orange->addComponent<CBoundingBox>(sf::Vector2f(gridSize, gridSize));
+
+	std::cout << "Orange spawned at (" << pos.x << ", " << pos.y << ")\n";
+}
+
+void Scene_Snake::spawnBlueberry()
+{
+	std::uniform_int_distribution<int> dist(1, gridCount - 2);
+	int cellX = dist(rng);
+	int cellY = dist(rng);
+
+	if (isCellOccupied(cellX, cellY, gridSize))
+	{
+		spawnBlueberry();
+		return;
+	}
+
+	sf::Vector2f pos(cellX * gridSize + gridSize / 2.f, cellY * gridSize + gridSize / 2.f);
+	auto blueberry = _entityManager.addEntity("blueberry");
+	blueberry->addComponent<CTransform>(pos);
+	auto& sprite = blueberry->addComponent<CSprite>(Assets::getInstance().getTexture("blueberry")).sprite;
+	centerOrigin(sprite);
+	float scaleX = gridSize / sprite.getLocalBounds().width;
+	float scaleY = gridSize / sprite.getLocalBounds().height;
+	sprite.setScale(scaleX, scaleY);
+	blueberry->addComponent<CBoundingBox>(sf::Vector2f(gridSize, gridSize));
+
+	std::cout << "Blueberry spawned at (" << pos.x << ", " << pos.y << ")\n";
+}
+
+void Scene_Snake::checkWallCollision()
+{
+	if (!_player->hasComponent<CBoundingBox>())
+		return;
+
+	for (auto& wall : _entityManager.getEntities("wall"))
+	{
+        if (!wall->hasComponent<CBoundingBox>())
+			continue;
+		
+		sf::Vector2f overlap = Physics::getOverlap(_player, wall);
+
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			std::cout << "Collision with wall detected! Resetting game to menu.\n";
+			_game->changeScene("MENU", std::make_shared<Scene_Menu>(_game), true);
+			return;
+		}
+	}
+}
+
+void Scene_Snake::checkAppleCollision()
+{
+	if (!_player->hasComponent<CBoundingBox>())
+		return;
+
+	for (auto& apple : _entityManager.getEntities("apple"))
+	{
+		if (!apple->hasComponent<CBoundingBox>())
+			continue;
+
+		sf::Vector2f overlap = Physics::getOverlap(_player, apple);
+
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			std::cout << "Apple collision detected!\n";
+
+			_scoreTotal += 10;
+
+			apple->destroy();
+
+			spawnApple();
+
+			break;
+		}
+	}
+
+}
+
+void Scene_Snake::checkOrangeCollision()
+{
+	if (!_player->hasComponent<CBoundingBox>())
+		return;
+
+	for (auto& orange : _entityManager.getEntities("orange"))
+	{
+		if (!orange->hasComponent<CBoundingBox>())
+			continue;
+
+		sf::Vector2f overlap = Physics::getOverlap(_player, orange);
+
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			std::cout << "Orange collision detected!\n";
+
+			_scoreTotal += 20;
+
+			orange->destroy();
+
+			spawnOrange();
+
+			break;
+		}
+	}
+}
+
+void Scene_Snake::checkBlueberryCollision()
+{
+	if (!_player->hasComponent<CBoundingBox>())
+		return;
+
+	for (auto& blueberry : _entityManager.getEntities("blueberry"))
+	{
+		if (!blueberry->hasComponent<CBoundingBox>())
+			continue;
+
+		sf::Vector2f overlap = Physics::getOverlap(_player, blueberry);
+
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			std::cout << "Blueberry collision detected!\n";
+			_scoreTotal += 30;
+
+			blueberry->destroy();
+			spawnBlueberry();
+			break;
+		}
+	}
+}
+
+bool Scene_Snake::isCellOccupied(int cellX, int cellY, float cellSize)
+{
+	// Check the snake (player)
+	sf::Vector2f playerPos = _player->getComponent<CTransform>().pos;
+	int pCellX = static_cast<int>(playerPos.x / cellSize);
+	int pCellY = static_cast<int>(playerPos.y / cellSize);
+	if (pCellX == cellX && pCellY == cellY)
+		return true;
+
+	// Check apples
+	for (auto& apple : _entityManager.getEntities("apple"))
+	{
+		sf::Vector2f pos = apple->getComponent<CTransform>().pos;
+		int eCellX = static_cast<int>(pos.x / cellSize);
+		int eCellY = static_cast<int>(pos.y / cellSize);
+		if (eCellX == cellX && eCellY == cellY)
+			return true;
+	}
+
+	// Check oranges
+	for (auto& orange : _entityManager.getEntities("orange"))
+	{
+		sf::Vector2f pos = orange->getComponent<CTransform>().pos;
+		int eCellX = static_cast<int>(pos.x / cellSize);
+		int eCellY = static_cast<int>(pos.y / cellSize);
+		if (eCellX == cellX && eCellY == cellY)
+			return true;
+	}
+
+	// Check blueberries
+	for (auto& blueberry : _entityManager.getEntities("blueberry"))
+	{
+		sf::Vector2f pos = blueberry->getComponent<CTransform>().pos;
+		int eCellX = static_cast<int>(pos.x / cellSize);
+		int eCellY = static_cast<int>(pos.y / cellSize);
+		if (eCellX == cellX && eCellY == cellY)
+			return true;
+	}
+	return false;
 }
 
 void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 {
 	_player = _entityManager.addEntity("player");
-
 	_player->addComponent<CTransform>(pos);
 
 	auto& sprite = _player->addComponent<CSprite>(Assets::getInstance().getTexture("snake")).sprite;
 
-	sf::FloatRect bounds = sprite.getLocalBounds();
+	centerOrigin(sprite);
 
-	sf::FloatRect scaledBounds = sprite.getGlobalBounds();
-	_player->addComponent<CBoundingBox>(sf::Vector2f(scaledBounds.width, scaledBounds.height));
+	float scaleX = gridSize / sprite.getLocalBounds().width;
+	float scaleY = gridSize / sprite.getLocalBounds().height;
+	sprite.setScale(scaleX, scaleY);
+
+	sf::FloatRect newBounds = sprite.getGlobalBounds();
+	_player->addComponent<CBoundingBox>(sf::Vector2f(newBounds.width, newBounds.height));
 
 	_player->addComponent<CState>().state = "Alive";
 
-	int gridCount = 21;
-	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
 	_player->getComponent<CTransform>().vel = sf::Vector2f(0, -gridSize);
 }
 
@@ -290,37 +487,37 @@ void Scene_Snake::playerMovement(sf::Time dt)
 {
 	float gridSize = static_cast<float>(_game->window().getSize().x) / 31.f;
 
-	sf::Vector2f movementDelta(0.f, 0.f);
+	sf::Vector2f movement(0.f, 0.f);
 	auto& pos = _player->getComponent<CTransform>().pos;
 
 	if (_player->getComponent<CInput>().dir == 1)
 	{
-		movementDelta.y -= gridSize;
+		movement.y -= gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 2)
 	{
-		movementDelta.y += gridSize;
+		movement.y += gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 4)
 	{
-		movementDelta.x -= gridSize;
+		movement.x -= gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 	if (_player->getComponent<CInput>().dir == 8)
 	{
-		movementDelta.x += gridSize;
+		movement.x += gridSize;
 		_player->getComponent<CInput>().dir = 0;
 		SoundPlayer::getInstance().play("hop", pos);
 	}
 
-	if (movementDelta != sf::Vector2f(0.f, 0.f))
+	if (movement != sf::Vector2f(0.f, 0.f))
 	{
-		pos += movementDelta;
+		pos += movement;
 		std::cout << "Snake moved to (" << pos.x << ", " << pos.y << ")\n";
 	}
 }
@@ -407,6 +604,10 @@ void Scene_Snake::sMovement(sf::Time dt)
 
 void Scene_Snake::sCollisions()
 {
+	checkWallCollision();
+	checkAppleCollision();
+	checkOrangeCollision();
+	checkBlueberryCollision();
 }
 
 void Scene_Snake::sUpdate(sf::Time dt)
