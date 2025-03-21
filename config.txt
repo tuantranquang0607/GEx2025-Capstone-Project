@@ -29,13 +29,3 @@ Sound death             ../assets/Sound/froggerDie.wav
 Sound hop               ../assets/Sound/froggerMove.wav
 
 
-
-#
-#  Animation    Name            Texture        Repeats
-Animation       up              Entities          yes
-Animation       down            Entities          no
-Animation       left            Entities          no
-Animation       right           Entities          no
-Animation       die             Entities          no
-
-Animation       lives           Entities    1        no
