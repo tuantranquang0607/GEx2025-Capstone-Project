@@ -57,6 +57,8 @@ class Scene_Snake : public Scene
 	void spawnBlueberry();                              // Spawns a blueberry entity in the game world
 	void checkWallCollision();                          // Checks for collisions between the player and walls
 	void checkAppleCollision();                         // Checks for collisions between the player and apples
+	void checkOrangeCollision();                        // Checks for collisions between the player and oranges
+	void checkBlueberryCollision();                     // Checks for collisions between the player and blueberries
 
     int gridCount;
     float gridSize;

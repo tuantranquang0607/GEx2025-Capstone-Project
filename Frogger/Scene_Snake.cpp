@@ -329,9 +329,7 @@ void Scene_Snake::checkWallCollision()
 	for (auto& wall : _entityManager.getEntities("wall"))
 	{
         if (!wall->hasComponent<CBoundingBox>())
-		{
 			continue;
-		}
 		
 		sf::Vector2f overlap = Physics::getOverlap(_player, wall);
 
@@ -359,6 +357,7 @@ void Scene_Snake::checkAppleCollision()
 		if (overlap.x > 0 && overlap.y > 0)
 		{
 			std::cout << "Apple collision detected!\n";
+
 			_scoreTotal += 10;
 
 			apple->destroy();
@@ -369,6 +368,57 @@ void Scene_Snake::checkAppleCollision()
 		}
 	}
 
+}
+
+void Scene_Snake::checkOrangeCollision()
+{
+	if (!_player->hasComponent<CBoundingBox>())
+		return;
+
+	for (auto& orange : _entityManager.getEntities("orange"))
+	{
+		if (!orange->hasComponent<CBoundingBox>())
+			continue;
+
+		sf::Vector2f overlap = Physics::getOverlap(_player, orange);
+
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			std::cout << "Orange collision detected!\n";
+
+			_scoreTotal += 20;
+
+			orange->destroy();
+
+			spawnOrange();
+
+			break;
+		}
+	}
+}
+
+void Scene_Snake::checkBlueberryCollision()
+{
+	if (!_player->hasComponent<CBoundingBox>())
+		return;
+
+	for (auto& blueberry : _entityManager.getEntities("blueberry"))
+	{
+		if (!blueberry->hasComponent<CBoundingBox>())
+			continue;
+
+		sf::Vector2f overlap = Physics::getOverlap(_player, blueberry);
+
+		if (overlap.x > 0 && overlap.y > 0)
+		{
+			std::cout << "Blueberry collision detected!\n";
+			_scoreTotal += 30;
+
+			blueberry->destroy();
+			spawnBlueberry();
+			break;
+		}
+	}
 }
 
 bool Scene_Snake::isCellOccupied(int cellX, int cellY, float cellSize)
@@ -556,6 +606,8 @@ void Scene_Snake::sCollisions()
 {
 	checkWallCollision();
 	checkAppleCollision();
+	checkOrangeCollision();
+	checkBlueberryCollision();
 }
 
 void Scene_Snake::sUpdate(sf::Time dt)
