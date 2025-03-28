@@ -13,6 +13,7 @@ Music missionTheme      ../assets/Music/tweener.ogg
 Texture Background      ../assets/Textures/background.png  
 Texture logo 		../assets/Textures/logo.png
 Texture snake		../assets/Textures/snake.png
+Texture snakeTail	../assets/Textures/snakeTail.png
 Texture wall		../assets/Textures/wall.png
 Texture apple		../assets/Textures/apple.png
 Texture orange		../assets/Textures/orange.png
@@ -29,13 +30,3 @@ Sound death             ../assets/Sound/froggerDie.wav
 Sound hop               ../assets/Sound/froggerMove.wav
 
 
-
-#
-#  Animation    Name            Texture        Repeats
-Animation       up              Entities          yes
-Animation       down            Entities          no
-Animation       left            Entities          no
-Animation       right           Entities          no
-Animation       die             Entities          no
-
-Animation       lives           Entities    1        no
