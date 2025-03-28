@@ -65,12 +65,18 @@ class Scene_Snake : public Scene
 
     bool isCellOccupied(int cellX, int cellY, float cellSize);
 
-    // Keep track of snake segments (index 0 will be the head).
-    std::vector<sPtrEntt> _snakeSegments;
+    std::vector<sPtrEntt> _snakeSegments;               // Keep track of snake segments (index 0 will be the head).
 
-    // Helper function to grow the snake (adds a new tail segment).
-    void growSnake();
-    float snakeSpeed = 5.f;
+	void growSnake();                                   // Helper function to grow the snake (adds a new tail segment).
+	void shrinkSnake();                                 // Helper function to shrink the snake (substracts a new tail segment).
+
+    float _snakeSpeed = 5.f;
+    float _originalSpeed = 5.f;
+    float _slowdownTimer = 0.f;
+
+    void reduceSnakeVelocityFor5s();
+
+    void updateSlowdown(sf::Time dt);
 
 public:
     // Constructor: Initializes the Scene_Snake instance with a pointer to the GameEngine and the level file path.

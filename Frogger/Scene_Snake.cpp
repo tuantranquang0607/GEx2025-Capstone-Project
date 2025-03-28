@@ -39,9 +39,49 @@ void Scene_Snake::growSnake()
 	std::cout << "Snake grew!\n";
 }
 
+void Scene_Snake::shrinkSnake()
+{
+	if (_snakeSegments.size() <= 1)
+	{
+		std::cout << "Cannot shrink snake further; only head remains.\n";
+		return;
+	}
+
+	auto tailSegment = _snakeSegments.back();
+	tailSegment->destroy();
+	_snakeSegments.pop_back();
+
+	std::cout << "Snake shrunk. New length: " << _snakeSegments.size() << "\n";
+}
+
+void Scene_Snake::reduceSnakeVelocityFor5s()
+{
+	if (_slowdownTimer <= 0.f)
+	{
+		_originalSpeed = _snakeSpeed;
+		_snakeSpeed *= 0.5f;
+		_slowdownTimer = 5.f;
+		std::cout << "Snake velocity reduced by half for 5 seconds.\n";
+	}
+}
+
+void Scene_Snake::updateSlowdown(sf::Time dt)
+{
+	if (_slowdownTimer > 0.f)
+	{
+		_slowdownTimer -= dt.asSeconds();
+		if (_slowdownTimer <= 0.f)
+		{
+			_snakeSpeed = _originalSpeed;
+			_slowdownTimer = 0.f;
+			std::cout << "Snake velocity restored.\n";
+		}
+	}
+}
+
 Scene_Snake::Scene_Snake(GameEngine* gameEngine, const std::string& levelPath) : Scene(gameEngine)
 {
-	gridCount = 31;
+	gridCount = 16;
 	gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
 
 	init(levelPath);
@@ -66,6 +106,8 @@ void Scene_Snake::init(const std::string& levelPath)
 
 void Scene_Snake::update(sf::Time dt)
 {
+	updateSlowdown(dt);
+
 	if (_lives < 1)
 	{
 		SoundPlayer::getInstance().play("death", _player->getComponent<CTransform>().pos);
@@ -154,19 +196,19 @@ void Scene_Snake::sDoAction(const Command& command)
 		}
 		else if (command.name() == "LEFT")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(-snakeSpeed * gridSize, 0);
+			_player->getComponent<CTransform>().vel = sf::Vector2f(-_snakeSpeed * gridSize, 0);
 		}
 		else if (command.name() == "RIGHT")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(snakeSpeed * gridSize, 0);
+			_player->getComponent<CTransform>().vel = sf::Vector2f(_snakeSpeed * gridSize, 0);
 		}
 		else if (command.name() == "UP")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(0, -snakeSpeed * gridSize);
+			_player->getComponent<CTransform>().vel = sf::Vector2f(0, -_snakeSpeed * gridSize);
 		}
 		else if (command.name() == "DOWN")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(0, snakeSpeed * gridSize);
+			_player->getComponent<CTransform>().vel = sf::Vector2f(0, _snakeSpeed * gridSize);
 		}
 	}
 	else if (command.type() == "END")
@@ -200,7 +242,7 @@ void Scene_Snake::registerActions()
 
 void Scene_Snake::spawnWalls()
 {
-	int gridCount = 31;
+	int gridCount = 16;
 	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
 
 	for (int x = 0; x < gridCount; x++)
@@ -293,14 +335,13 @@ void Scene_Snake::spawnApple()
 
 void Scene_Snake::spawnOrange()
 {
-	// Random cell from 1 to gridCount - 2 (to avoid the walls)
 	std::uniform_int_distribution<int> dist(1, gridCount - 2);
 	int cellX = dist(rng);
 	int cellY = dist(rng);
 
 	if (isCellOccupied(cellX, cellY, gridSize))
 	{
-		spawnOrange(); // Try a new random position.
+		spawnOrange();
 		return;
 	}
 
@@ -420,6 +461,9 @@ void Scene_Snake::checkOrangeCollision()
 
 			spawnOrange();
 
+			shrinkSnake();
+			shrinkSnake();
+
 			break;
 		}
 	}
@@ -443,7 +487,15 @@ void Scene_Snake::checkBlueberryCollision()
 			_scoreTotal += 30;
 
 			blueberry->destroy();
+
 			spawnBlueberry();
+
+			growSnake();
+			growSnake();
+			growSnake();
+
+			reduceSnakeVelocityFor5s();
+
 			break;
 		}
 	}
@@ -508,7 +560,7 @@ void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 
 	_player->addComponent<CState>().state = "Alive";
 
-	_player->getComponent<CTransform>().vel = sf::Vector2f(0, -snakeSpeed * gridSize);
+	_player->getComponent<CTransform>().vel = sf::Vector2f(0, -_snakeSpeed * gridSize);
 
 	_snakeSegments.push_back(_player);
 }
