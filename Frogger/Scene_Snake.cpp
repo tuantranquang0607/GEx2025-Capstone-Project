@@ -18,6 +18,27 @@ namespace
 	std::mt19937 rng(rd());
 }
 
+void Scene_Snake::growSnake()
+{
+	auto tail = _snakeSegments.back();
+	sf::Vector2f tailPos = tail->getComponent<CTransform>().pos;
+
+	auto newSegment = _entityManager.addEntity("snakeSegment");
+	newSegment->addComponent<CTransform>(tailPos);
+
+	auto& sprite = newSegment->addComponent<CSprite>(Assets::getInstance().getTexture("snakeTail")).sprite;
+	centerOrigin(sprite);
+	float scaleX = gridSize / sprite.getLocalBounds().width;
+	float scaleY = gridSize / sprite.getLocalBounds().height;
+	sprite.setScale(scaleX, scaleY);
+
+	newSegment->addComponent<CBoundingBox>(sf::Vector2f(gridSize, gridSize));
+
+	_snakeSegments.push_back(newSegment);
+
+	std::cout << "Snake grew!\n";
+}
+
 Scene_Snake::Scene_Snake(GameEngine* gameEngine, const std::string& levelPath) : Scene(gameEngine)
 {
 	gridCount = 31;
@@ -133,19 +154,19 @@ void Scene_Snake::sDoAction(const Command& command)
 		}
 		else if (command.name() == "LEFT")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(-gridSize, 0);
+			_player->getComponent<CTransform>().vel = sf::Vector2f(-snakeSpeed * gridSize, 0);
 		}
 		else if (command.name() == "RIGHT")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(gridSize, 0);
+			_player->getComponent<CTransform>().vel = sf::Vector2f(snakeSpeed * gridSize, 0);
 		}
 		else if (command.name() == "UP")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(0, -gridSize);
+			_player->getComponent<CTransform>().vel = sf::Vector2f(0, -snakeSpeed * gridSize);
 		}
 		else if (command.name() == "DOWN")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(0, gridSize);
+			_player->getComponent<CTransform>().vel = sf::Vector2f(0, snakeSpeed * gridSize);
 		}
 	}
 	else if (command.type() == "END")
@@ -364,6 +385,13 @@ void Scene_Snake::checkAppleCollision()
 
 			spawnApple();
 
+			growSnake();
+			growSnake();
+			growSnake();
+			growSnake();
+			growSnake();
+			growSnake();
+
 			break;
 		}
 	}
@@ -480,12 +508,14 @@ void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 
 	_player->addComponent<CState>().state = "Alive";
 
-	_player->getComponent<CTransform>().vel = sf::Vector2f(0, -gridSize);
+	_player->getComponent<CTransform>().vel = sf::Vector2f(0, -snakeSpeed * gridSize);
+
+	_snakeSegments.push_back(_player);
 }
 
 void Scene_Snake::playerMovement(sf::Time dt)
 {
-	float gridSize = static_cast<float>(_game->window().getSize().x) / 31.f;
+	/*float gridSize = static_cast<float>(_game->window().getSize().x) / 31.f;
 
 	sf::Vector2f movement(0.f, 0.f);
 	auto& pos = _player->getComponent<CTransform>().pos;
@@ -519,7 +549,7 @@ void Scene_Snake::playerMovement(sf::Time dt)
 	{
 		pos += movement;
 		std::cout << "Snake moved to (" << pos.x << ", " << pos.y << ")\n";
-	}
+	}*/
 }
 
 void Scene_Snake::adjustPlayerPosition()
@@ -592,13 +622,16 @@ void Scene_Snake::loadLevel(const std::string& path)
 
 void Scene_Snake::sMovement(sf::Time dt)
 {
-	playerMovement(dt);
+	std::vector<sf::Vector2f> oldPositions(_snakeSegments.size());
+	for (size_t i = 0; i < _snakeSegments.size(); i++)
+		oldPositions[i] = _snakeSegments[i]->getComponent<CTransform>().pos;
 
-	for (auto& e : _entityManager.getEntities())
+	auto& headTfm = _snakeSegments[0]->getComponent<CTransform>();
+	headTfm.pos += headTfm.vel * dt.asSeconds();
+
+	for (size_t i = 1; i < _snakeSegments.size(); i++)
 	{
-		auto& tfm = e->getComponent<CTransform>();
-		tfm.pos += tfm.vel * dt.asSeconds();
-		tfm.angle += tfm.angVel * dt.asSeconds();
+		_snakeSegments[i]->getComponent<CTransform>().pos = oldPositions[i - 1];
 	}
 }
 
