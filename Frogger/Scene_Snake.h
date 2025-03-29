@@ -14,6 +14,14 @@
 #include "Scene.h"                                      // Base class for all game scenes (e.g., menu, gameplay)
 #include "GameEngine.h"                                 // Core game engine class that manages the window and scene switching
 
+enum class Direction
+{
+    Up,
+    Down,
+    Left,
+    Right
+};
+
 // Define the Scene_Snake class, which represents the gameplay scene for the Snake game.
 // It inherits from the base Scene class.
 class Scene_Snake : public Scene
@@ -48,7 +56,7 @@ class Scene_Snake : public Scene
     void init(const std::string& path);                 // Initializes the scene (loads level data, sets up entities) from a file path
     void loadLevel(const std::string& path);            // Loads level configuration and entity placements from a file
     void spawnPlayer(sf::Vector2f pos);                 // Creates and positions the player entity at the given position
-    void playerMovement(sf::Time dt);                   // Handles player-specific movement logic based on user input and time (dt)
+    /*void playerMovement(sf::Time dt);*/                   // Handles player-specific movement logic based on user input and time (dt)
     void adjustPlayerPosition();                        // Ensures the player stays within defined game boundaries
     void registerActions();                             // Sets up input actions (keyboard mappings) for this scene
 	void spawnWalls();                                  // Spawns a wall entity in the game world
@@ -70,13 +78,18 @@ class Scene_Snake : public Scene
 	void growSnake();                                   // Helper function to grow the snake (adds a new tail segment).
 	void shrinkSnake();                                 // Helper function to shrink the snake (substracts a new tail segment).
 
-    float _snakeSpeed = 5.f;
+    float _snakeSpeed = 3.f;
     float _originalSpeed = 5.f;
     float _slowdownTimer = 0.f;
 
     void reduceSnakeVelocityFor5s();
 
     void updateSlowdown(sf::Time dt);
+
+    /*void checkSnakeCollision();*/
+    Direction _currentDir = Direction::Up;
+
+    void updateVelocity();
 
 public:
     // Constructor: Initializes the Scene_Snake instance with a pointer to the GameEngine and the level file path.

@@ -79,9 +79,55 @@ void Scene_Snake::updateSlowdown(sf::Time dt)
 	}
 }
 
+//void Scene_Snake::checkSnakeCollision()
+//{
+//	if (_snakeSegments.size() < 2)
+//		return;
+//
+//	auto head = _snakeSegments[0];
+//
+//	if (!head->hasComponent<CBoundingBox>())
+//		return;
+//
+//	for (size_t i = 1; i < _snakeSegments.size(); ++i)
+//	{
+//		auto segment = _snakeSegments[i];
+//
+//		if (!segment->hasComponent<CBoundingBox>())
+//			continue;
+//
+//		sf::Vector2f overlap = Physics::getOverlap(head, segment);
+//		if (overlap.x > 0 && overlap.y > 0)
+//		{
+//			std::cout << "Self-collision detected! Snake dies.\n";
+//			_game->changeScene("MENU", std::make_shared<Scene_Menu>(_game), true);
+//			return;
+//		}
+//	}
+//}
+
+void Scene_Snake::updateVelocity()
+{
+	switch (_currentDir)
+	{
+	case Direction::Up:
+		_player->getComponent<CTransform>().vel = sf::Vector2f(0, -_snakeSpeed * gridSize);
+		break;
+	case Direction::Down:
+		_player->getComponent<CTransform>().vel = sf::Vector2f(0, _snakeSpeed * gridSize);
+		break;
+	case Direction::Left:
+		_player->getComponent<CTransform>().vel = sf::Vector2f(-_snakeSpeed * gridSize, 0);
+		break;
+	case Direction::Right:
+		_player->getComponent<CTransform>().vel = sf::Vector2f(_snakeSpeed * gridSize, 0);
+		break;
+	}
+}
+
 Scene_Snake::Scene_Snake(GameEngine* gameEngine, const std::string& levelPath) : Scene(gameEngine)
 {
-	gridCount = 16;
+	gridCount = 17;
 	gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
 
 	init(levelPath);
@@ -196,19 +242,49 @@ void Scene_Snake::sDoAction(const Command& command)
 		}
 		else if (command.name() == "LEFT")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(-_snakeSpeed * gridSize, 0);
+			switch (_currentDir)
+			{
+			case Direction::Up:
+				_currentDir = Direction::Left;
+				break;
+			case Direction::Left:
+				_currentDir = Direction::Down;
+				break;
+			case Direction::Down:
+				_currentDir = Direction::Right;
+				break;
+			case Direction::Right:
+				_currentDir = Direction::Up;
+				break;
+			}
+			updateVelocity();
 		}
 		else if (command.name() == "RIGHT")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(_snakeSpeed * gridSize, 0);
+			switch (_currentDir)
+			{
+			case Direction::Up:
+				_currentDir = Direction::Right;
+				break;
+			case Direction::Right:
+				_currentDir = Direction::Down;
+				break;
+			case Direction::Down:
+				_currentDir = Direction::Left;
+				break;
+			case Direction::Left:
+				_currentDir = Direction::Up;
+				break;
+			}
+			updateVelocity();
 		}
 		else if (command.name() == "UP")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(0, -_snakeSpeed * gridSize);
+			updateVelocity();
 		}
 		else if (command.name() == "DOWN")
 		{
-			_player->getComponent<CTransform>().vel = sf::Vector2f(0, _snakeSpeed * gridSize);
+			// Typically, reverse is not allowed; ignore.
 		}
 	}
 	else if (command.type() == "END")
@@ -242,7 +318,7 @@ void Scene_Snake::registerActions()
 
 void Scene_Snake::spawnWalls()
 {
-	int gridCount = 16;
+	int gridCount = 17;
 	float gridSize = static_cast<float>(_game->window().getSize().x) / gridCount;
 
 	for (int x = 0; x < gridCount; x++)
@@ -565,44 +641,44 @@ void Scene_Snake::spawnPlayer(sf::Vector2f pos)
 	_snakeSegments.push_back(_player);
 }
 
-void Scene_Snake::playerMovement(sf::Time dt)
-{
-	/*float gridSize = static_cast<float>(_game->window().getSize().x) / 31.f;
-
-	sf::Vector2f movement(0.f, 0.f);
-	auto& pos = _player->getComponent<CTransform>().pos;
-
-	if (_player->getComponent<CInput>().dir == 1)
-	{
-		movement.y -= gridSize;
-		_player->getComponent<CInput>().dir = 0;
-		SoundPlayer::getInstance().play("hop", pos);
-	}
-	if (_player->getComponent<CInput>().dir == 2)
-	{
-		movement.y += gridSize;
-		_player->getComponent<CInput>().dir = 0;
-		SoundPlayer::getInstance().play("hop", pos);
-	}
-	if (_player->getComponent<CInput>().dir == 4)
-	{
-		movement.x -= gridSize;
-		_player->getComponent<CInput>().dir = 0;
-		SoundPlayer::getInstance().play("hop", pos);
-	}
-	if (_player->getComponent<CInput>().dir == 8)
-	{
-		movement.x += gridSize;
-		_player->getComponent<CInput>().dir = 0;
-		SoundPlayer::getInstance().play("hop", pos);
-	}
-
-	if (movement != sf::Vector2f(0.f, 0.f))
-	{
-		pos += movement;
-		std::cout << "Snake moved to (" << pos.x << ", " << pos.y << ")\n";
-	}*/
-}
+//void Scene_Snake::playerMovement(sf::Time dt)
+//{
+//	float gridSize = static_cast<float>(_game->window().getSize().x) / 31.f;
+//
+//	sf::Vector2f movement(0.f, 0.f);
+//	auto& pos = _player->getComponent<CTransform>().pos;
+//
+//	if (_player->getComponent<CInput>().dir == 1)
+//	{
+//		movement.y -= gridSize;
+//		_player->getComponent<CInput>().dir = 0;
+//		SoundPlayer::getInstance().play("hop", pos);
+//	}
+//	if (_player->getComponent<CInput>().dir == 2)
+//	{
+//		movement.y += gridSize;
+//		_player->getComponent<CInput>().dir = 0;
+//		SoundPlayer::getInstance().play("hop", pos);
+//	}
+//	if (_player->getComponent<CInput>().dir == 4)
+//	{
+//		movement.x -= gridSize;
+//		_player->getComponent<CInput>().dir = 0;
+//		SoundPlayer::getInstance().play("hop", pos);
+//	}
+//	if (_player->getComponent<CInput>().dir == 8)
+//	{
+//		movement.x += gridSize;
+//		_player->getComponent<CInput>().dir = 0;
+//		SoundPlayer::getInstance().play("hop", pos);
+//	}
+//
+//	if (movement != sf::Vector2f(0.f, 0.f))
+//	{
+//		pos += movement;
+//		std::cout << "Snake moved to (" << pos.x << ", " << pos.y << ")\n";
+//	}
+//}
 
 void Scene_Snake::adjustPlayerPosition()
 {
@@ -693,6 +769,7 @@ void Scene_Snake::sCollisions()
 	checkAppleCollision();
 	checkOrangeCollision();
 	checkBlueberryCollision();
+	/*checkSnakeCollision();*/
 }
 
 void Scene_Snake::sUpdate(sf::Time dt)
