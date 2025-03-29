@@ -2,6 +2,7 @@
 #include "Scene_Snake.h"
 #include "MusicPlayer.h"
 #include <memory>
+#include "Scene_Instruction.h"
 
 void Scene_Menu::onEnd()
 {
@@ -13,8 +14,6 @@ Scene_Menu::Scene_Menu(GameEngine* gameEngine)
 {
 	init();
 }
-
-
 
 void Scene_Menu::init()
 {
@@ -29,12 +28,10 @@ void Scene_Menu::init()
 	registerAction(sf::Keyboard::Escape, "QUIT");
 
 	_title = "Snappy Snake";
-	_menuStrings.push_back("Level 1");
-	_menuStrings.push_back("Level 2");
-	_menuStrings.push_back("Level 3");
+	_menuStrings.push_back("Play");
+	_menuStrings.push_back("How to play");
+	_menuStrings.push_back("High Score");
 
-	_levelPaths.push_back("../assets/level1.txt");
-	_levelPaths.push_back("../assets/level1.txt");
 	_levelPaths.push_back("../assets/level1.txt");
 
 	_menuText.setFont(Assets::getInstance().getFont("main"));
@@ -62,7 +59,6 @@ void Scene_Menu::update(sf::Time dt)
 
 void Scene_Menu::sRender()
 {
-
 	sf::View view = _game->window().getView();
 	view.setCenter(_game->window().getSize().x / 2.f, _game->window().getSize().y / 2.f);
 	_game->window().setView(view);
@@ -72,7 +68,7 @@ void Scene_Menu::sRender()
 	static const sf::Color backgroundColor(100, 100, 255);
 
 	sf::Text footer("UP: W    DOWN: S   PLAY:D    QUIT: ESC",
-		Assets::getInstance().getFont("main"), 20);
+		Assets::getInstance().getFont("main"), 30);
 	footer.setFillColor(normalColor);
 	footer.setPosition(32, 530);
 
@@ -111,12 +107,18 @@ void Scene_Menu::sDoAction(const Command& action)
 		}
 		else if (action.name() == "PLAY")
 		{
-			_game->changeScene("PLAY", std::make_shared<Scene_Snake>(_game, _levelPaths[_menuIndex]));
-		}
-		else if (action.name() == "QUIT")
-		{
-			onEnd();
+			if (_menuIndex == 0)
+			{
+				_game->changeScene("PLAY", std::make_shared<Scene_Snake>(_game, _levelPaths[0]));
+			}
+			else if (_menuIndex == 1)
+			{
+				_game->changeScene("INSTRUCTION", std::make_shared<Scene_Instruction>(_game), false);
+			}
+			else if (_menuIndex == 2)
+			{
+				std::cout << "High Score scene not yet implemented.\n";
+			}
 		}
 	}
-
 }
