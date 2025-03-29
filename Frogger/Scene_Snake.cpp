@@ -168,6 +168,8 @@ void Scene_Snake::sRender()
 
 void Scene_Snake::sDoAction(const Command& command)
 {
+	auto& vel = _player->getComponent<CTransform>().vel;
+
 	if (command.type() == "START")
 	{
 		if (command.name() == "PAUSE")
@@ -196,18 +198,26 @@ void Scene_Snake::sDoAction(const Command& command)
 		}
 		else if (command.name() == "LEFT")
 		{
+			if (vel.x > 0)
+				return;
 			_player->getComponent<CTransform>().vel = sf::Vector2f(-_snakeSpeed * gridSize, 0);
 		}
 		else if (command.name() == "RIGHT")
 		{
+			if (vel.x < 0)
+				return;
 			_player->getComponent<CTransform>().vel = sf::Vector2f(_snakeSpeed * gridSize, 0);
 		}
 		else if (command.name() == "UP")
 		{
+			if (vel.y > 0)
+				return;
 			_player->getComponent<CTransform>().vel = sf::Vector2f(0, -_snakeSpeed * gridSize);
 		}
 		else if (command.name() == "DOWN")
 		{
+			if (vel.y < 0)
+				return;
 			_player->getComponent<CTransform>().vel = sf::Vector2f(0, _snakeSpeed * gridSize);
 		}
 	}
