@@ -10,7 +10,9 @@ private:
     sf::Text _scoreText;
     sf::Text _inputLabel;
     sf::Text _nameInput;
+
     std::string _playerName;
+
     int _finalScore;
     bool _submitted = false;
 

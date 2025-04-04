@@ -15,6 +15,7 @@ void Scene_GameOver::init()
 {
     registerAction(sf::Keyboard::Return, "ENTER");
     registerAction(sf::Keyboard::BackSpace, "BACKSPACE");
+    registerAction(sf::Keyboard::Escape, "ESC");
 
     for (char c = 'A'; c <= 'Z'; ++c)
         registerAction(static_cast<sf::Keyboard::Key>(c - 'A' + sf::Keyboard::A), std::string(1, c));
@@ -33,7 +34,8 @@ void Scene_GameOver::init()
     _scoreText.setPosition(_game->windowSize().x / 2.f, 180);
 
     _inputLabel.setFont(Assets::getInstance().getFont("main"));
-    _inputLabel.setString("Enter your name:");
+    _inputLabel.setString("Type your name and press ENTER to save your score,\n"
+        "or just press ENTER or ESC to return to the main menu.");
     _inputLabel.setCharacterSize(30);
     centerOrigin(_inputLabel);
     _inputLabel.setPosition(_game->windowSize().x / 2.f, 260);
@@ -41,7 +43,7 @@ void Scene_GameOver::init()
     _nameInput.setFont(Assets::getInstance().getFont("main"));
     _nameInput.setCharacterSize(40);
     _nameInput.setFillColor(sf::Color::White);
-    _nameInput.setPosition(_game->windowSize().x / 2.f - 100, 300);
+    _nameInput.setPosition(_game->windowSize().x / 2.f - 125, 300);
 }
 
 void Scene_GameOver::update(sf::Time dt)
@@ -79,6 +81,11 @@ void Scene_GameOver::sDoAction(const Command& action)
         {
             if (!_playerName.empty())
                 _playerName.pop_back();
+        }
+        else if (action.name() == "ESC")
+        {
+            _submitted = true;
+            _game->changeScene("MENU", std::make_shared<Scene_Menu>(_game), true);
         }
         else if (action.name().size() == 1 && _playerName.size() < 10)
         {
