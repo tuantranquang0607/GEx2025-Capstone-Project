@@ -11,6 +11,7 @@
 #include <random>
 #include <fstream>
 #include <iostream>
+#include "Scene_GameOver.h"
 
 namespace
 {
@@ -407,8 +408,10 @@ void Scene_Snake::checkWallCollision()
 
 		if (overlap.x > 0 && overlap.y > 0)
 		{
-			std::cout << "Collision with wall detected! Resetting game to menu.\n";
-			_game->changeScene("MENU", std::make_shared<Scene_Menu>(_game), true);
+			std::cout << "Collision with wall detected! Resetting game to game over window.\n";
+
+			_game->changeScene("GAMEOVER", std::make_shared<Scene_GameOver>(_game, _scoreTotal + _score), true);
+
 			return;
 		}
 	}
