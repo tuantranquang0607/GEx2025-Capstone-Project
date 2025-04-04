@@ -93,7 +93,6 @@ void Scene_Menu::sRender()
 	//m_game->window().display();
 }
 
-
 void Scene_Menu::sDoAction(const Command& action)
 {
 	if (action.type() == "START")

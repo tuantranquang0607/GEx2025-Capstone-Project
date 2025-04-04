@@ -31,11 +31,12 @@ void Scene_GameOver::init()
     _scoreText.setString("Your Score: " + std::to_string(_finalScore));
     _scoreText.setCharacterSize(40);
     centerOrigin(_scoreText);
-    _scoreText.setPosition(_game->windowSize().x / 2.f, 180);
+    _scoreText.setPosition(_game->windowSize().x / 2.f, 170);
 
     _inputLabel.setFont(Assets::getInstance().getFont("main"));
     _inputLabel.setString("Type your name and press ENTER to save your score,\n"
-        "or just press ENTER or ESC to return to the main menu.");
+                        "or just press ENTER or ESC to return to the main menu\n" 
+                        "without saving your score.");
     _inputLabel.setCharacterSize(30);
     centerOrigin(_inputLabel);
     _inputLabel.setPosition(_game->windowSize().x / 2.f, 260);
@@ -43,7 +44,7 @@ void Scene_GameOver::init()
     _nameInput.setFont(Assets::getInstance().getFont("main"));
     _nameInput.setCharacterSize(40);
     _nameInput.setFillColor(sf::Color::White);
-    _nameInput.setPosition(_game->windowSize().x / 2.f - 125, 300);
+    _nameInput.setPosition(_game->windowSize().x / 2.f - 170, 300);
 }
 
 void Scene_GameOver::update(sf::Time dt)
