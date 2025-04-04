@@ -3,6 +3,7 @@
 #include "MusicPlayer.h"
 #include <memory>
 #include "Scene_Instruction.h"
+#include "Scene_DisplayHighScore.h"
 
 void Scene_Menu::onEnd()
 {
@@ -59,36 +60,38 @@ void Scene_Menu::update(sf::Time dt)
 
 void Scene_Menu::sRender()
 {
-	sf::View view = _game->window().getView();
-	view.setCenter(_game->window().getSize().x / 2.f, _game->window().getSize().y / 2.f);
-	_game->window().setView(view);
+    sf::View view = _game->window().getView();
+    view.setCenter(_game->window().getSize().x / 2.f, _game->window().getSize().y / 2.f);
+    _game->window().setView(view);
 
-	static const sf::Color selectedColor(255, 255, 255);
-	static const sf::Color normalColor(0, 0, 0);
-	static const sf::Color backgroundColor(100, 100, 255);
+    static const sf::Color selectedColor(255, 255, 255);
+    static const sf::Color normalColor(128, 128, 128);
+    static const sf::Color backgroundColor(100, 100, 255);
 
-	sf::Text footer("UP: W    DOWN: S   PLAY:D    QUIT: ESC",
-		Assets::getInstance().getFont("main"), 30);
-	footer.setFillColor(normalColor);
-	footer.setPosition(32, 530);
+    sf::Text footer("UP: W    DOWN: S   PLAY:D    QUIT: ESC", Assets::getInstance().getFont("main"), 45);
+    footer.setFillColor(normalColor);
+    sf::FloatRect footerBounds = footer.getLocalBounds();
+    footer.setPosition((_game->window().getSize().x - footerBounds.width) / 2.f, (_game->window().getSize().y - footerBounds.height) / 2.f);
 
-	_game->window().clear(backgroundColor);
-	_game->window().draw(_backgroundSprite);
+    _game->window().clear(backgroundColor);
+    _game->window().draw(_backgroundSprite);
 
-	_menuText.setFillColor(normalColor);
-	_menuText.setString(_title);
-	_menuText.setPosition(10, 10);
-	_game->window().draw(_menuText);
+    _menuText.setFillColor(normalColor);
+    _menuText.setString(_title);
+    sf::FloatRect titleBounds = _menuText.getLocalBounds();
+    _menuText.setPosition((_game->window().getSize().x - titleBounds.width) / 2.f, 10);
+    _game->window().draw(_menuText);
 
-	for (size_t i{ 0 }; i < _menuStrings.size(); ++i)
-	{
-		_menuText.setFillColor((i == _menuIndex ? selectedColor : normalColor));
-		_menuText.setPosition(32, 32 + (i + 1) * 96);
-		_menuText.setString(_menuStrings.at(i));
-		_game->window().draw(_menuText);
-	}
+    for (size_t i{ 0 }; i < _menuStrings.size(); ++i)
+    {
+        _menuText.setFillColor((i == _menuIndex ? selectedColor : normalColor));
+        _menuText.setString(_menuStrings.at(i));
+        sf::FloatRect textBounds = _menuText.getLocalBounds();
+        _menuText.setPosition((_game->window().getSize().x - textBounds.width) / 2.f, 32 + (i + 1) * 96);
+        _game->window().draw(_menuText);
+    }
 
-	_game->window().draw(footer);
+    _game->window().draw(footer);
 	//m_game->window().display();
 }
 
@@ -117,7 +120,8 @@ void Scene_Menu::sDoAction(const Command& action)
 			}
 			else if (_menuIndex == 2)
 			{
-				std::cout << "High Score scene not yet implemented.\n";
+				_game->changeScene("HIGHSCORES", std::make_shared<Scene_DisplayHighScore>(_game), false);
+				;
 			}
 		}
 	}
