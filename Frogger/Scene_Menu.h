@@ -23,7 +23,5 @@ public:
 
 	void sRender() override;
 	void sDoAction(const Command& action) override;
-
-
 };
 

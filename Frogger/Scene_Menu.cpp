@@ -49,14 +49,12 @@ void Scene_Menu::init()
 		static_cast<float>(winSize.x) / textureSize.x,
 		static_cast<float>(winSize.y) / textureSize.y
 	);
-
 }
 
 void Scene_Menu::update(sf::Time dt)
 {
 	_entityManager.update();
 }
-
 
 void Scene_Menu::sRender()
 {
@@ -95,7 +93,6 @@ void Scene_Menu::sRender()
 	//m_game->window().display();
 }
 
-
 void Scene_Menu::sDoAction(const Command& action)
 {
 	if (action.type() == "START")
@@ -121,8 +118,11 @@ void Scene_Menu::sDoAction(const Command& action)
 			else if (_menuIndex == 2)
 			{
 				_game->changeScene("HIGHSCORES", std::make_shared<Scene_DisplayHighScore>(_game), false);
-				;
 			}
+		}
+		else if (action.name() == "QUIT")
+		{
+			_game->quit();  // This will close the window and stop the game
 		}
 	}
 }
