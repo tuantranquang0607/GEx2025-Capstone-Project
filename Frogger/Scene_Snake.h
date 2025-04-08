@@ -41,8 +41,7 @@ class Scene_Snake : public Scene
     void sUpdate(sf::Time dt);                          // Updates the overall scene (combining movement, collisions, etc.)
     void onEnd() override;                              // Called when the scene is ending; overrides the base Scene onEnd()
     void drawScore();                                   // Renders the current score on the screen
-    void getScore();                                    // Calculates or updates the score based on game events
-    void drawGameOver();                                // Renders the "Game Over" screen when the player loses
+	void sAnimation(sf::Time dt);				        // Updates animations for entities based on the elapsed time (dt)
 
     // --- Helper Functions: Utility functions for scene initialization and management ---
     void init(const std::string& path);                 // Initializes the scene (loads level data, sets up entities) from a file path

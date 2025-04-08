@@ -20,6 +20,16 @@ struct Component
 };
 
 
+struct CAnimation : public Component
+{
+    Animation   animation;
+
+    CAnimation() = default;
+    CAnimation(const Animation& a) : animation(a) {}
+
+};
+
+
 struct CSprite : public Component {
     sf::Sprite sprite;
 
@@ -55,7 +65,6 @@ struct CTransform : public Component
             : pos(p), prevPos(p),  vel(v){}
 
 };
-
 
 
 struct CBoundingBox : public Component

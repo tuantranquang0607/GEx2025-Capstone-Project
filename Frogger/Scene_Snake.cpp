@@ -61,7 +61,7 @@ void Scene_Snake::reduceSnakeVelocityFor5s()
 	{
 		_originalSpeed = _snakeSpeed;
 		_snakeSpeed *= 0.5f;
-		_slowdownTimer = 5.f;
+		_slowdownTimer = 2.f;
 		std::cout << "Snake velocity reduced by half for 5 seconds.\n";
 	}
 }
@@ -102,17 +102,17 @@ void Scene_Snake::init(const std::string& levelPath)
 	spawnBlueberry();
 
 	MusicPlayer::getInstance().play("gameTheme");
-	MusicPlayer::getInstance().setVolume(100);
+	MusicPlayer::getInstance().setVolume(50);
 }
 
 void Scene_Snake::update(sf::Time dt)
 {
 	updateSlowdown(dt);
 
-	if (_lives < 1)
+	/*if (_lives < 1)
 	{
 		SoundPlayer::getInstance().play("death", _player->getComponent<CTransform>().pos);
-	}
+	}*/
 
 	sUpdate(dt);
 }
@@ -159,12 +159,6 @@ void Scene_Snake::sRender()
 	}
 
 	drawScore();
-
-	if (_lives < 1)
-	{
-		drawGameOver();
-		return;
-	}
 }
 
 void Scene_Snake::sDoAction(const Command& command)
@@ -408,6 +402,8 @@ void Scene_Snake::checkWallCollision()
 
 		if (overlap.x > 0 && overlap.y > 0)
 		{
+			SoundPlayer::getInstance().play("death", _player->getComponent<CTransform>().pos);
+
 			std::cout << "Collision with wall detected! Resetting game to game over window.\n";
 
 			_game->changeScene("GAMEOVER", std::make_shared<Scene_GameOver>(_game, _scoreTotal + _score), true);
@@ -432,6 +428,8 @@ void Scene_Snake::checkAppleCollision()
 		if (overlap.x > 0 && overlap.y > 0)
 		{
 			std::cout << "Apple collision detected!\n";
+
+			SoundPlayer::getInstance().play("apple", _player->getComponent<CTransform>().pos);
 
 			_scoreTotal += 10;
 
@@ -468,6 +466,8 @@ void Scene_Snake::checkOrangeCollision()
 		{
 			std::cout << "Orange collision detected!\n";
 
+			SoundPlayer::getInstance().play("orange", _player->getComponent<CTransform>().pos);
+
 			_scoreTotal += 20;
 
 			orange->destroy();
@@ -497,6 +497,9 @@ void Scene_Snake::checkBlueberryCollision()
 		if (overlap.x > 0 && overlap.y > 0)
 		{
 			std::cout << "Blueberry collision detected!\n";
+
+			SoundPlayer::getInstance().play("blueberry", _player->getComponent<CTransform>().pos);
+
 			_scoreTotal += 30;
 
 			blueberry->destroy();
@@ -718,6 +721,7 @@ void Scene_Snake::sUpdate(sf::Time dt)
 	sMovement(dt);
 	sCollisions();
 	adjustPlayerPosition();
+	sAnimation(dt);
 }
 
 void Scene_Snake::onEnd()
@@ -741,23 +745,21 @@ void Scene_Snake::drawScore()
 	_game->window().draw(text);
 }
 
-void Scene_Snake::getScore()
+void Scene_Snake::sAnimation(sf::Time dt)
 {
-	auto pos = _player->getComponent<CTransform>().pos.y;
-	int posY = static_cast<int>(pos);
-}
+	for (auto e : _entityManager.getEntities())
+	{
+		if (e->getComponent<CAnimation>().has)
+		{
+			auto& anim = e->getComponent<CAnimation>();
 
-void Scene_Snake::drawGameOver()
-{
-	std::string str = "GAME OVER";
-	sf::Text text = sf::Text(str, Assets::getInstance().getFont("Arial"), 60);
-	centerOrigin(text);
-	text.setPosition(240.f, 300.f);
-	_game->window().draw(text);
+			anim.animation.update(dt);
 
-	std::string strEsc = "Press ESC";
-	sf::Text textEsc = sf::Text(strEsc, Assets::getInstance().getFont("Arial"), 40);
-	centerOrigin(textEsc);
-	textEsc.setPosition(240.f, 340.f);
-	_game->window().draw(textEsc);
+			if (_player->getComponent<CAnimation>().animation.getName() == "die" && anim.animation.hasEnded() && e->getTag() == "player")
+			{
+				_player->getComponent<CTransform>().pos = sf::Vector2f{ _game->windowSize().x / 2.f, _game->windowSize().y - 20.f };
+				_player->addComponent<CAnimation>(Assets::getInstance().getAnimation("up"));
+			}
+		}
+	}
 }
