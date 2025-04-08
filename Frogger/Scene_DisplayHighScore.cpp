@@ -29,6 +29,16 @@ void Scene_DisplayHighScore::init()
     _footerText.setPosition(_game->windowSize().x / 2.f, _game->windowSize().y - 50);
 
     loadScoresFromFile();
+
+    _backgroundSprite.setTexture(Assets::getInstance().getTexture("logo"));
+
+    sf::Vector2u winSize = _game->window().getSize();
+
+    sf::Vector2u textureSize = Assets::getInstance().getTexture("logo").getSize();
+    _backgroundSprite.setScale(
+        static_cast<float>(winSize.x) / textureSize.x,
+        static_cast<float>(winSize.y) / textureSize.y
+	);
 }
 
 void Scene_DisplayHighScore::loadScoresFromFile()
@@ -75,6 +85,8 @@ void Scene_DisplayHighScore::update(sf::Time dt)
 void Scene_DisplayHighScore::sRender()
 {
     _game->window().clear(sf::Color(50, 50, 80));
+
+    _game->window().draw(_backgroundSprite); // background FIRST
 
     _game->window().draw(_titleText);
     for (const auto& text : _scoreTexts)

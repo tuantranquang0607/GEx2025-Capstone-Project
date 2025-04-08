@@ -12,6 +12,7 @@ private:
     sf::Text _titleText;
     std::vector<sf::Text> _scoreTexts;
     sf::Text _footerText;
+    sf::Sprite					_backgroundSprite;
 
     void init();
     void loadScoresFromFile();

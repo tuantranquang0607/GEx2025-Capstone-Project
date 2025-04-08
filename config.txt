@@ -7,7 +7,7 @@ Font    main            ../assets/fonts/Sansation.ttf
 Font    Arcade          ../assets/fonts/arcadeclassic.regular.ttf
 
 Music gameTheme         ../assets/Music/frogger.ogg
-Music missionTheme      ../assets/Music/tweener.ogg
+Music menuTheme      	../assets/Music/tweener.ogg
 
 # Textures
 Texture Background      ../assets/Textures/background.png  
@@ -18,15 +18,17 @@ Texture wall		../assets/Textures/wall.png
 Texture apple		../assets/Textures/apple.png
 Texture orange		../assets/Textures/orange.png
 Texture blueberry	../assets/Textures/blueberry.png
+Texture apple2_texture 	../assets/Textures/apple2.png
 
+# SOUNDS
+Sound death             ../assets/Sound/die.wav
+Sound apple             ../assets/Sound/apple.wav
+Sound orange            ../assets/Sound/orange.wav
+Sound blueberry         ../assets/Sound/blueberry.wav
 
 # Sprites
 Sprite Background       Background   0 0  900 900
 Sprite Title            Title 	     0 0  900 900
 
-#
-# SOUNDS
-Sound death             ../assets/Sound/froggerDie.wav
-Sound hop               ../assets/Sound/froggerMove.wav
 
 
