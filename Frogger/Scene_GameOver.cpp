@@ -13,6 +13,15 @@ Scene_GameOver::Scene_GameOver(GameEngine* game, int finalScore)
 
 void Scene_GameOver::init()
 {
+    _backgroundSprite.setTexture(Assets::getInstance().getTexture("gameOver"));
+
+    sf::Vector2u winSize = _game->window().getSize();
+    sf::Vector2u textureSize = _backgroundSprite.getTexture()->getSize();
+    _backgroundSprite.setScale(
+        static_cast<float>(winSize.x) / textureSize.x,
+        static_cast<float>(winSize.y) / textureSize.y
+    );
+
     registerAction(sf::Keyboard::Return, "ENTER");
     registerAction(sf::Keyboard::BackSpace, "BACKSPACE");
     registerAction(sf::Keyboard::Escape, "ESC");
@@ -54,10 +63,12 @@ void Scene_GameOver::update(sf::Time dt)
 
 void Scene_GameOver::sRender()
 {
-    _game->window().clear(sf::Color::Black);
-    _game->window().draw(_gameOverText);
+    _game->window().clear(sf::Color::Black);             // Clear first
+    _game->window().draw(_backgroundSprite);             // Then draw background
+    _game->window().draw(_gameOverText);                 // Then draw text
     _game->window().draw(_scoreText);
     _game->window().draw(_inputLabel);
+
     _nameInput.setString(_playerName + "_");
     _game->window().draw(_nameInput);
 }

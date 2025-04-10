@@ -10,6 +10,7 @@ private:
     sf::Text _scoreText;
     sf::Text _inputLabel;
     sf::Text _nameInput;
+    sf::Sprite _backgroundSprite;
 
     std::string _playerName;
 
