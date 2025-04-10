@@ -16,6 +16,9 @@ void Scene_DisplayHighScore::init()
 {
     registerAction(sf::Keyboard::Escape, "BACK");
 
+    _titleText.setFillColor(sf::Color::Black);
+    _footerText.setFillColor(sf::Color::Black);
+
     _titleText.setFont(Assets::getInstance().getFont("main"));
     _titleText.setString("HIGH SCORES");
     _titleText.setCharacterSize(60);
@@ -30,51 +33,53 @@ void Scene_DisplayHighScore::init()
 
     loadScoresFromFile();
 
-    _backgroundSprite.setTexture(Assets::getInstance().getTexture("logo"));
+    _backgroundSprite.setTexture(Assets::getInstance().getTexture("displayHighScore"));
 
     sf::Vector2u winSize = _game->window().getSize();
 
-    sf::Vector2u textureSize = Assets::getInstance().getTexture("logo").getSize();
+    sf::Vector2u textureSize = Assets::getInstance().getTexture("displayHighScore").getSize();
     _backgroundSprite.setScale(
         static_cast<float>(winSize.x) / textureSize.x,
         static_cast<float>(winSize.y) / textureSize.y
 	);
 }
 
-void Scene_DisplayHighScore::loadScoresFromFile()
-{
-    std::ifstream file("../assets/highscores.txt");
-    std::string name;
-    int score;
+void Scene_DisplayHighScore::loadScoresFromFile()  
+{  
+   std::ifstream file("../assets/highscores.txt");  
+   std::string name;  
+   int score;  
 
-    while (file >> name >> score)
-    {
-        _scores.emplace_back(name, score);
-    }
+   while (file >> name >> score)  
+   {  
+       _scores.emplace_back(name, score);  
+   }  
 
-    std::sort(_scores.begin(), _scores.end(),
-        [](const auto& a, const auto& b)
-        {
-            return a.second > b.second; // descending
-        });
+   std::sort(_scores.begin(), _scores.end(),  
+       [](const auto& a, const auto& b)  
+       {  
+           return a.second > b.second; // descending  
+       });  
 
-    _scoreTexts.clear();
-    float yStart = 120.f;
+   _scoreTexts.clear();  
 
-    for (size_t i = 0; i < _scores.size(); ++i)
-    {
-        std::stringstream ss;
-        ss << i + 1 << ". " << _scores[i].first << " - " << _scores[i].second;
+   float yStart = 120.f;  
 
-        sf::Text scoreText;
-        scoreText.setFont(Assets::getInstance().getFont("main"));
-        scoreText.setString(ss.str());
-        scoreText.setCharacterSize(30);
-        centerOrigin(scoreText);
-        scoreText.setPosition(_game->windowSize().x / 2.f, yStart + i * 40.f);
+   for (size_t i = 0; i < _scores.size(); ++i)  
+   {  
+       std::stringstream ss;  
+       ss << i + 1 << ". " << _scores[i].first << " - " << _scores[i].second;  
 
-        _scoreTexts.push_back(scoreText);
-    }
+       sf::Text scoreText;  
+       scoreText.setFont(Assets::getInstance().getFont("main"));  
+       scoreText.setString(ss.str());  
+       scoreText.setCharacterSize(30);  
+       scoreText.setFillColor(sf::Color::Black); // Set fill color for each sf::Text  
+       centerOrigin(scoreText);  
+       scoreText.setPosition(_game->windowSize().x / 2.f, yStart + i * 40.f);  
+
+       _scoreTexts.push_back(scoreText);  
+   }  
 }
 
 void Scene_DisplayHighScore::update(sf::Time dt)

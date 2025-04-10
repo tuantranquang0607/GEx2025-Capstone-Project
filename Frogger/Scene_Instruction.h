@@ -8,7 +8,7 @@ class Scene_Instruction : public Scene
 private:
     sf::Text m_instructionText;
     sf::Sprite m_backgroundSprite;
-
+    
     void init();
 
 public:

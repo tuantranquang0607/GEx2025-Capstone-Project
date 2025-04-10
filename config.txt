@@ -10,15 +10,18 @@ Music gameTheme         ../assets/Music/frogger.ogg
 Music menuTheme      	../assets/Music/tweener.ogg
 
 # Textures
-Texture Background      ../assets/Textures/background.png  
-Texture logo 		../assets/Textures/logo.png
-Texture snake		../assets/Textures/snake.png
-Texture snakeTail	../assets/Textures/snakeTail.png
-Texture wall		../assets/Textures/wall.png
-Texture apple		../assets/Textures/apple.png
-Texture orange		../assets/Textures/orange.png
-Texture blueberry	../assets/Textures/blueberry.png
-Texture apple2_texture 	../assets/Textures/apple2.png
+Texture Background       ../assets/Textures/background.png  
+Texture logo 		 ../assets/Textures/logo.png
+Texture instruction  	 ../assets/Textures/instruction.png
+Texture snake		 ../assets/Textures/snake.png
+Texture snakeTail	 ../assets/Textures/snakeTail.png
+Texture wall		 ../assets/Textures/wall.png
+Texture apple		 ../assets/Textures/apple.png
+Texture orange		 ../assets/Textures/orange.png
+Texture blueberry	 ../assets/Textures/blueberry.png
+Texture apple2_texture 	 ../assets/Textures/apple2.png
+Texture displayHighScore ../assets/Textures/displayHighScore.png
+Texture gameOver         ../assets/Textures/gameOver.png
 
 # SOUNDS
 Sound death             ../assets/Sound/die.wav
